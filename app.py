@@ -2,23 +2,24 @@ import os
 import shutil
 import uuid
 import time
-import os
 os.environ["HF_HUB_DISABLE_IMPLICIT_TOKEN"] = "1"
 os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
 import warnings
 warnings.filterwarnings("ignore")
 from typing import List
 
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
+from image_delivery import jxl_webp_preview, resolve_product_image
 from search_engine import index_images, search_multi
 from index_manager import get_manager
 from search_engine import detect_duplicates
 app = FastAPI()
 manager = get_manager()
+
 
 # ================= MIDDLEWARE =================
 app.add_middleware(
@@ -55,6 +56,32 @@ def serve_home():
 def serve_q4():
     return FileResponse("static/Q4HT.html")
 
+
+@app.get("/product-image/{image_path:path}")
+def serve_jxl_image(image_path: str):
+    source = resolve_product_image(image_path)
+    if source.suffix.lower() != ".jxl":
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(
+        source,
+        media_type="image/jxl",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
+
+@app.get("/image-preview/{image_path:path}")
+def serve_jxl_preview(image_path: str):
+    source = resolve_product_image(image_path)
+    if source.suffix.lower() != ".jxl":
+        raise HTTPException(status_code=404, detail="Image not found")
+    preview = jxl_webp_preview(image_path, source)
+    return FileResponse(
+        preview,
+        media_type="image/webp",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
+
 # ================= SEARCH WITH PAGINATION =================
 @app.post("/search-multi")
 async def api_search(
@@ -82,6 +109,12 @@ async def api_search(
         return {"results": [], "total": 0, "has_more": False}
 
     try:
+        if manager.index is None or manager.index.ntotal == 0:
+            raise HTTPException(
+                status_code=503,
+                detail="Chỉ mục tìm kiếm chưa được tạo. Hãy chạy build_index.py "
+                "trong thư mục dự án rồi khởi động lại server.",
+            )
         data = search_multi(tmp_paths, page=page, page_size=page_size)
         print(f"✅ Search done in {time.time()-start_total:.3f}s")
         return data

@@ -19,6 +19,12 @@ The builder updates only new, changed, or removed images. Run it again after
 changing the model or OCR setting. Use `build_index.py --force` to re-encode all
 active images for the current settings.
 
+JPEG XL (`.jxl`) images are supported in `products_active`; the builder reads
+them directly without converting the originals. Install `requirements.txt`
+before indexing, then run `build_index.py` to add them to search. Browsers that
+support JPEG XL receive the original image, and other browsers receive a cached
+WebP preview generated on first request.
+
 ## Compare embedding models
 
 Model settings are read by both the builder and the server. Each configuration

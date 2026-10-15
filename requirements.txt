@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 pillow
+pillow-jxl-plugin
 numpy
 faiss-cpu
 torch

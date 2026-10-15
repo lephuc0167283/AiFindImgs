@@ -1,4 +1,6 @@
 import io
+
+import pillow_jxl
 from PIL import Image, ImageOps
 
 try:

@@ -21,7 +21,7 @@ from ocr_search import extract_text
 from search_config import CACHE_PATH, INDEX_PATH, META_PATH
 
 IMAGE_FOLDER = "products_active"
-SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".webp")
+SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".webp", ".jxl")
 BATCH_SIZE = 8
 NUM_WORKERS = 6
 
@@ -138,7 +138,7 @@ def main():
     else:
         print("GPU unavailable; building on CPU.")
 
-    model, _, preprocess = get_model()
+    model, preprocess = get_model()
     model = model.to(device).eval()
 
     if args.force:

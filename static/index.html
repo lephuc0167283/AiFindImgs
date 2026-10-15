@@ -1524,7 +1524,9 @@
           const data = await res.json().catch(() => ({}));
 
           if (!res.ok) {
-            throw new Error(data.error || "Server error " + res.status);
+            throw new Error(
+              data.detail || data.error || "Server error " + res.status,
+            );
           }
 
           results = data.results || [];
@@ -1574,7 +1576,9 @@
           const data = await res.json().catch(() => ({}));
 
           if (!res.ok) {
-            throw new Error(data.error || "Server error " + res.status);
+            throw new Error(
+              data.detail || data.error || "Server error " + res.status,
+            );
           }
 
           results = [...results, ...(data.results || [])];
@@ -1630,7 +1634,9 @@
           );
           const data = await res.json().catch(() => ({}));
           if (!res.ok) {
-            throw new Error(data.error || "Server error " + res.status);
+            throw new Error(
+              data.detail || data.error || "Server error " + res.status,
+            );
           }
 
           const box = document.getElementById("results");
@@ -1699,6 +1705,53 @@
         );
       }
 
+      function getJxlUrl(path, endpoint) {
+        const encodedPath = String(path || "")
+          .replace(/^\/+/, "")
+          .split("/")
+          .map(encodeURIComponent)
+          .join("/");
+        return API + "/" + endpoint + "/" + encodedPath;
+      }
+
+      function setImageSource(image, path) {
+        const isJxl = /\.jxl$/i.test(String(path || ""));
+        let picture = image.parentElement?.tagName === "PICTURE"
+          ? image.parentElement
+          : null;
+
+        if (isJxl) {
+          if (!picture) {
+            picture = document.createElement("picture");
+            if (image.parentNode) {
+              image.replaceWith(picture);
+            }
+            picture.appendChild(image);
+          }
+          let source = picture.querySelector("source[data-jxl]");
+          if (!source) {
+            source = document.createElement("source");
+            source.type = "image/jxl";
+            source.dataset.jxl = "";
+            picture.insertBefore(source, image);
+          }
+          source.srcset = getJxlUrl(path, "product-image");
+          image.src = getJxlUrl(path, "image-preview");
+          return;
+        }
+
+        if (picture) {
+          picture.querySelector("source[data-jxl]")?.remove();
+        }
+        image.src = getImageUrl(path);
+      }
+
+      function setImagePreviewSource(image, path) {
+        image.src = /\.jxl$/i.test(String(path || ""))
+          ? getJxlUrl(path, "image-preview")
+          : getImageUrl(path);
+      }
+
       function draw(arr) {
         const box = document.getElementById("results");
         box.innerHTML = "";
@@ -1711,7 +1764,7 @@
 
         arr.forEach((item, index) => {
           const imgs = item.images?.length ? item.images : [item.image_url];
-          const firstImg = getImageUrl(imgs[0]);
+          const firstImg = imgs[0];
           const score = Number(item.score) || 0;
           const itemId = String(item.item_id ?? "");
           const card = document.createElement("div");
@@ -1722,30 +1775,31 @@
           imageWrap.className = "card-img-wrap";
           const mainImage = document.createElement("img");
           mainImage.className = "main-img";
-          mainImage.src = firstImg;
           mainImage.alt = "Ảnh sản phẩm " + itemId;
           mainImage.loading = "lazy";
+          imageWrap.appendChild(mainImage);
+          setImageSource(mainImage, firstImg);
+          let activeImagePath = firstImg;
           mainImage.addEventListener("click", () => {
-            if (mainImage.src) openModal(mainImage.src);
+            if (activeImagePath) openModal(activeImagePath);
           });
           mainImage.addEventListener("error", () => {
             mainImage.removeAttribute("src");
             mainImage.alt = "Không tải được ảnh sản phẩm";
             mainImage.classList.add("image-error");
           }, { once: true });
-          imageWrap.appendChild(mainImage);
-
           if (imgs.length > 1) {
             const strip = document.createElement("div");
             strip.className = "image-strip";
             imgs.forEach((path, imageIndex) => {
               const thumb = document.createElement("img");
               thumb.className = "thumb" + (imageIndex === 0 ? " active" : "");
-              thumb.src = getImageUrl(path);
+              setImagePreviewSource(thumb, path);
               thumb.alt = "Ảnh " + (imageIndex + 1) + " của sản phẩm " + itemId;
               thumb.loading = "lazy";
               thumb.addEventListener("click", () => {
-                mainImage.src = thumb.src;
+                activeImagePath = path;
+                setImageSource(mainImage, activeImagePath);
                 strip.querySelectorAll(".thumb").forEach((image) =>
                   image.classList.remove("active"),
                 );
@@ -1821,7 +1875,9 @@
         );
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          throw new Error(data.error || "Server error " + res.status);
+          throw new Error(
+            data.detail || data.error || "Server error " + res.status,
+          );
         }
         return data;
       }
@@ -1892,13 +1948,13 @@
         }
 
         document.getElementById("compareQuery").src = selectedFiles[0].preview;
-        document.getElementById("compareResult").src = resultImage;
+        setImageSource(document.getElementById("compareResult"), resultImage);
         document.getElementById("compareModal").style.display = "flex";
       }
 
       // ================= MODAL =================
       function openModal(src) {
-        document.getElementById("modalImg").src = src;
+        setImageSource(document.getElementById("modalImg"), src);
         document.getElementById("modal").style.display = "flex";
       }
 
