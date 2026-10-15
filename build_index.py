@@ -18,11 +18,13 @@ from image_preprocess import retrieval_views
 from index_manager import create_search_index
 from model_loader import get_model
 from ocr_search import extract_text
-from search_config import CACHE_PATH, INDEX_PATH, META_PATH
+from search_config import CACHE_PATH, INDEX_PATH, META_PATH, OCR_ENABLED
 
 IMAGE_FOLDER = "products_active"
 SUPPORTED_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp", ".webp", ".jxl")
-BATCH_SIZE = 8
+GPU_BATCH_SIZE = 16
+CPU_BATCH_SIZE = 8
+CHECKPOINT_INTERVAL = 1000
 NUM_WORKERS = 6
 
 
@@ -131,6 +133,7 @@ def main():
     args = parser.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    batch_size = GPU_BATCH_SIZE if device == "cuda" else CPU_BATCH_SIZE
     if device == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
         torch.backends.cudnn.allow_tf32 = True
@@ -219,12 +222,27 @@ def main():
     )
     started = time.perf_counter()
     encoded_images = 0
+    processed_images = 0
     errors = 0
+    next_checkpoint = CHECKPOINT_INTERVAL
     pending_tensors = []
     pending_paths = []
 
+    def report_progress():
+        elapsed = max(time.perf_counter() - started, 1e-6)
+        rate = encoded_images / elapsed
+        percentage = processed_images / len(changed_paths) * 100
+        print(
+            f"\rProgress {percentage:6.2f}% | "
+            f"Processed {processed_images}/{len(changed_paths)} | "
+            f"Indexed {encoded_images} | Skipped {errors} | "
+            f"{rate:.1f} images/s",
+            end="",
+            flush=True,
+        )
+
     def flush_batch():
-        nonlocal index, encoded_images, errors
+        nonlocal index, encoded_images, processed_images, next_checkpoint
         if not pending_paths:
             return
 
@@ -238,9 +256,11 @@ def main():
         for (path, signature), vectors in zip(
             pending_paths, features
         ):
-            with Image.open(path) as source:
-                image = ImageOps.exif_transpose(source).convert("RGB")
-            recognized_text = extract_text(image)
+            recognized_text = ""
+            if OCR_ENABLED:
+                with Image.open(path) as source:
+                    image = ImageOps.exif_transpose(source).convert("RGB")
+                recognized_text = extract_text(image)
 
             relative_path = os.path.relpath(path).replace("\\", "/")
             item_id = extract_item_id(path)
@@ -255,16 +275,20 @@ def main():
             cache[path] = signature
             encoded_images += 1
 
+        processed_images += len(pending_paths)
         pending_tensors.clear()
         pending_paths.clear()
-        elapsed = max(time.perf_counter() - started, 1e-6)
-        rate = encoded_images / elapsed
-        print(
-            f"\rEncoded {encoded_images}/{len(changed_paths)} images "
-            f"({rate:.1f} images/s)",
-            end="",
-            flush=True,
-        )
+        report_progress()
+
+        if encoded_images >= next_checkpoint:
+            print(
+                f"\nSaving checkpoint after {encoded_images} indexed images...",
+                flush=True,
+            )
+            save_index(index, meta, cache)
+            print("Checkpoint saved; continuing build.", flush=True)
+            while next_checkpoint <= encoded_images:
+                next_checkpoint += CHECKPOINT_INTERVAL
 
     with ThreadPoolExecutor(max_workers=NUM_WORKERS) as executor:
         loaded_images = executor.map(
@@ -276,17 +300,20 @@ def main():
         )
         for (path, signature), (tensors, error) in loaded_images:
             if error is not None:
-                print(f"\nSkip unreadable image {path}: {error}")
+                processed_images += 1
                 errors += 1
+                print(f"\nSkip unreadable image {path}: {error}")
+                report_progress()
                 continue
             pending_tensors.append(tensors)
             pending_paths.append((path, signature))
-            if len(pending_paths) >= BATCH_SIZE:
+            if len(pending_paths) >= batch_size:
                 flush_batch()
         flush_batch()
 
     if index is None:
         raise RuntimeError("No valid images were available to build the index.")
+    print()
     save_index(index, meta, cache)
     elapsed = time.perf_counter() - started
     print(

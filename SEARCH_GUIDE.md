@@ -18,6 +18,12 @@ From the project directory:
 The builder updates only new, changed, or removed images. Run it again after
 changing the model or OCR setting. Use `build_index.py --force` to re-encode all
 active images for the current settings.
+GPU builds batch 16 images at a time (CPU builds retain batches of 8) and
+automatically split a GPU batch if memory is insufficient. When OCR is disabled,
+each image is decoded only once during indexing.
+Build progress reports the processed percentage and image counts. A checkpoint
+is saved after every 1,000 successfully indexed images; the completed index is
+saved again at the end.
 
 JPEG XL (`.jxl`) images are supported in `products_active`; the builder reads
 them directly without converting the originals. Install `requirements.txt`
