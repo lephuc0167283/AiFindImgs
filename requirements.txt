@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+pillow
+numpy
+faiss-cpu
+torch
+open_clip_torch
+python-multipart
+rembg
+onnxruntime

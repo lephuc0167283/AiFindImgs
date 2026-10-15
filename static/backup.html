@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Tìm Hàng Secondhand PRO</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Inter;
+        background: #f5f7fb;
+        transition: 0.3s;
+      }
+      .dark {
+        background: #111;
+        color: #eee;
+      }
+      .container {
+        max-width: 1300px;
+        margin: auto;
+        padding: 20px;
+      }
+      h1 {
+        color: #1e40af;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: #475569;
+      }
+      .upload-box {
+        border: 2px dashed #cbd5e1;
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        background: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .upload-box.drag {
+        border-color: #2563eb;
+        background: #eff6ff;
+      }
+
+      .preview-list {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .preview-item {
+        position: relative;
+      }
+      .preview-item img {
+        width: 90px;
+        height: 90px;
+        border-radius: 10px;
+        object-fit: cover;
+      }
+      .remove-preview {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #000;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+
+      button {
+        padding: 8px 14px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .btn-search {
+        background: #2563eb;
+        color: #fff;
+      }
+      .btn-clear {
+        background: #e5e7eb;
+      }
+      .btn-duplicate {
+        background: #f59e0b;
+        color: #fff;
+      }
+
+      .results {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+      .top1 {
+        border: 2px solid #22c55e;
+      }
+      .card-img-wrap {
+        position: relative;
+        background: #f8fafc;
+        padding: 10px;
+      }
+
+      .main-img {
+        width: 100%;
+        height: 220px;
+        object-fit: contain;
+        cursor: pointer;
+        border-radius: 10px;
+        background: white;
+      }
+
+      .card-body {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+      .card-header .left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .card-header .right {
+        flex-shrink: 0;
+      }
+
+      .item-id {
+        font-weight: 700;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+
+      .score {
+        font-size: 12px;
+        color: #6b7280;
+        white-space: nowrap;
+      }
+      .detail-box {
+        font-size: 12px;
+        color: #475569;
+        background: #f1f5f9;
+        padding: 6px 8px;
+        border-radius: 8px;
+      }
+      .actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+      .actions button {
+        flex: 1;
+        font-size: 12px;
+        padding: 6px;
+        border-radius: 8px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .green {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .gray {
+        background: #e5e7eb;
+      }
+
+      .copy-btn {
+        margin-top: 6px;
+        background: #111;
+        color: #fff;
+      }
+      .manage-btn {
+        margin-top: 6px;
+        background: #ef4444;
+        color: #fff;
+      }
+      .restore-btn {
+        margin-top: 6px;
+        background: #22c55e;
+        color: #fff;
+      }
+
+      .load-more {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background: #2563eb;
+        color: #fff;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal img {
+        max-width: 90%;
+        max-height: 90%;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #111;
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 8px;
+        opacity: 0;
+        transition: 0.3s;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+
+      .toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #111;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      .skeleton {
+        height: 220px;
+        background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+        background-size: 200% 100%;
+        animation: loading 1.2s infinite;
+      }
+      @keyframes loading {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      .duplicate-group {
+        background: #fee2e2;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+      .compare-wrapper {
+        display: flex;
+        gap: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        max-width: 1200px;
+        width: 90%;
+      }
+
+      .compare-side {
+        flex: 1;
+        text-align: center;
+      }
+
+      .compare-side h3 {
+        margin-bottom: 10px;
+      }
+
+      .compare-side img {
+        width: 100%;
+        max-height: 80vh;
+        object-fit: contain;
+        background: #f8fafc;
+        border-radius: 10px;
+      }
+
+      .dark .compare-wrapper {
+        background: #222;
+      }
+
+      .image-strip {
+        display: flex;
+        gap: 6px;
+        padding: 8px;
+        overflow-x: auto;
+      }
+
+      .thumb {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        flex-shrink: 0;
+      }
+      .thumb:hover {
+        border-color: #2563eb;
+      }
+
+      .compare-btn {
+        margin-top: 6px;
+        background: #10b981;
+        color: white;
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="toggle" onclick="toggleDark()">🌙</div>
+
+    <div class="container">
+      <h1>🔍 AI Tìm Hàng Secondhand</h1>
+
+      <div class="upload-box" id="uploadBox">
+        👉 Kéo thả, click hoặc Ctrl+V để dán ảnh
+        <input type="file" id="files" hidden multiple accept="image/*" />
+      </div>
+
+      <div class="preview-list" id="previewList"></div>
+
+      <div style="margin-top: 10px">
+        <button class="btn-search" onclick="upload()">Tìm</button>
+        <button class="btn-clear" onclick="clearAll()">Xóa</button>
+        <button class="btn-duplicate" onclick="detectDuplicates()">
+          Tìm trùng
+        </button>
+      </div>
+
+      <div id="results" class="results"></div>
+
+      <button
+        id="loadMoreBtn"
+        class="load-more"
+        style="display: none"
+        onclick="loadMore()"
+      >
+        Xem thêm
+      </button>
+    </div>
+
+    <!-- IMAGE MODAL -->
+    <div class="modal" id="modal">
+      <img id="modalImg" />
+    </div>
+
+    <!-- COMPARE MODAL -->
+    <div class="modal" id="compareModal">
+      <div class="compare-wrapper">
+        <div class="compare-side">
+          <h3>Ảnh đã chọn</h3>
+          <img id="compareQuery" />
+        </div>
+
+        <div class="compare-side">
+          <h3>Ảnh tìm thấy</h3>
+          <img id="compareResult" />
+        </div>
+      </div>
+    </div>
+    <div id="toast" class="toast"></div>
+
+    <script>
+      const API = window.location.origin;
+
+      let files = [];
+      let previewUrls = [];
+      let results = [];
+      let currentPage = 1;
+      let pageSize = 20;
+      let hasMore = false;
+
+      /* DARK MODE */
+      function toggleDark() {
+        document.body.classList.toggle("dark");
+      }
+
+      /* PASTE IMAGE */
+      document.addEventListener("paste", (e) => {
+        for (let item of e.clipboardData.items) {
+          if (item.type.indexOf("image") !== -1) {
+            files.push(item.getAsFile());
+            renderPreview();
+            toast("📋 Đã dán ảnh");
+          }
+        }
+      });
+
+      /* DRAG */
+      const uploadBox = document.getElementById("uploadBox");
+      const input = document.getElementById("files");
+
+      uploadBox.onclick = () => input.click();
+      uploadBox.ondragover = (e) => {
+        e.preventDefault();
+        uploadBox.classList.add("drag");
+      };
+      uploadBox.ondrop = (e) => {
+        e.preventDefault();
+        uploadBox.classList.remove("drag");
+        files = [...files, ...e.dataTransfer.files];
+        renderPreview();
+      };
+      input.onchange = (e) => {
+        files = [...files, ...e.target.files];
+        renderPreview();
+      };
+
+      function renderPreview() {
+        const box = document.getElementById("previewList");
+        box.innerHTML = "";
+        previewUrls = [];
+
+        files.forEach((f, i) => {
+          const reader = new FileReader();
+
+          reader.onload = (e) => {
+            previewUrls[i] = e.target.result;
+
+            box.innerHTML += `
+            <div class="preview-item">
+            <img
+            src="${e.target.result}"
+            onclick="openModal('${e.target.result}')"
+            style="cursor:pointer">
+
+            <button
+            class="remove-preview"
+            onclick="removeFile(${i})">
+            ×
+            </button>
+
+            </div>`;
+          };
+
+          reader.readAsDataURL(f);
+        });
+      }
+      function removeFile(i) {
+        files.splice(i, 1);
+        renderPreview();
+      }
+      function clearAll() {
+        files = [];
+        results = [];
+        renderPreview();
+        document.getElementById("results").innerHTML = "";
+      }
+      function compareImages(resultImage) {
+        if (!previewUrls.length) {
+          toast("Chưa có ảnh upload");
+          return;
+        }
+
+        document.getElementById("compareQuery").src = previewUrls[0];
+
+        document.getElementById("compareResult").src = resultImage;
+
+        document.getElementById("compareModal").style.display = "flex";
+      }
+      /* LOADING */
+      function showLoading() {
+        const box = document.getElementById("results");
+        box.innerHTML = "";
+        for (let i = 0; i < 8; i++) {
+          box.innerHTML += `<div class="card"><div class="skeleton"></div></div>`;
+        }
+      }
+
+      /* SEARCH */
+      async function upload() {
+        if (!files.length) return alert("Chọn ảnh");
+        showLoading();
+        currentPage = 1;
+
+        const fd = new FormData();
+        files.forEach((f) => fd.append("files", f));
+        fd.append("page", currentPage);
+        fd.append("page_size", pageSize);
+
+        const res = await fetch(API + "/search-multi", {
+          method: "POST",
+          body: fd,
+        });
+        const data = await res.json();
+
+        results = data.results || [];
+        hasMore = data.has_more;
+
+        draw(results);
+        toggleLoadMore();
+      }
+
+      /* LOAD MORE */
+      async function loadMore() {
+        currentPage++;
+
+        const fd = new FormData();
+        files.forEach((f) => fd.append("files", f));
+        fd.append("page", currentPage);
+        fd.append("page_size", pageSize);
+
+        const res = await fetch(API + "/search-multi", {
+          method: "POST",
+          body: fd,
+        });
+        const data = await res.json();
+
+        results = [...results, ...(data.results || [])];
+        hasMore = data.has_more;
+
+        draw(results);
+        toggleLoadMore();
+      }
+
+      function toggleLoadMore() {
+        document.getElementById("loadMoreBtn").style.display = hasMore
+          ? "block"
+          : "none";
+      }
+
+      /* DUPLICATE DETECTION */
+      async function detectDuplicates() {
+        const threshold = prompt("Nhập threshold (0.9 - 0.99):", "0.95");
+        if (!threshold) return;
+
+        showLoading();
+
+        const res = await fetch(
+          API + "/detect-duplicates?threshold=" + threshold,
+        );
+        const data = await res.json();
+
+        const box = document.getElementById("results");
+        box.innerHTML = "";
+
+        if (!data.duplicates.length) {
+          box.innerHTML =
+            "<div style='grid-column:1/-1;text-align:center'>✅ Không có ảnh trùng</div>";
+          return;
+        }
+
+        data.duplicates.forEach((group) => {
+          box.innerHTML += `
+<div class="duplicate-group">
+<b>Nhóm trùng:</b> ${group.join(", ")}
+</div>`;
+        });
+      }
+
+      /* DRAW */
+      function draw(arr) {
+        const box = document.getElementById("results");
+        box.innerHTML = "";
+        if (!arr.length) {
+          box.innerHTML =
+            "<div style='grid-column:1/-1;text-align:center'>❌ Không tìm thấy</div>";
+          return;
+        }
+
+        arr.forEach((item, index) => {
+          let imgs = item.images?.length ? item.images : [item.image_url];
+
+          box.innerHTML += `
+<div class="card ${index === 0 ? "top1" : ""}">
+
+  <div class="card-img-wrap">
+
+    <img class="main-img"
+      src="${API + imgs[0]}"
+      onclick="openModal(this.src)">
+
+    <div class="image-strip">
+      ${imgs
+        .map(
+          (img) => `
+        <img class="thumb"
+          src="${API + img}"
+          onclick="changeMainImage(this)">
+      `,
+        )
+        .join("")}
+    </div>
+
+  </div>
+
+  <div class="card-body">
+<div class="card-header">
+
+  <div class="left">
+    <div class="item-id">#${item.item_id}</div>
+    <span class="badge ${item.score > 0.9 ? "green" : "gray"}">
+      ${item.score > 0.9 ? "TOP MATCH" : "GẦN ĐÚNG"}
+    </span>
+  </div>
+
+  <div class="right">
+    <div class="score">${(item.score * 100).toFixed(1)}%</div>
+  </div>
+
+</div>
+
+<div class="detail-box">
+  <div class="detail-row">
+    <span>🗓 ${item.modified_date || "Không có ngày"}</span>
+    <span>📦 ${imgs.length} tấm</span>
+  </div>
+</div>
+
+
+
+    <div class="actions">
+
+      <button class="copy-btn"
+        onclick="copy('${item.item_id}')">
+        Copy
+      </button>
+
+      <button class="compare-btn"
+        onclick="compareImages('${API + imgs[0]}')">
+        So sánh
+      </button>
+
+      <button class="manage-btn"
+        onclick="moveToSold('${item.item_id}')">
+        SOLD
+      </button>
+
+      <button class="manage-btn"
+        onclick="deleteItem('${item.item_id}')">
+        Xóa
+      </button>
+
+    </div>
+
+  </div>
+</div>
+`;
+        });
+      }
+
+      /* MANAGEMENT */
+      async function moveToSold(id) {
+        await fetch(API + "/move-to-sold/" + id, { method: "POST" });
+        toast("✅ Đã chuyển SOLD");
+      }
+      async function deleteItem(id) {
+        if (!confirm("Xóa sản phẩm?")) return;
+        await fetch(API + "/delete-item/" + id, { method: "POST" });
+        toast("🗑 Đã xóa");
+      }
+      async function restoreItem(id) {
+        await fetch(API + "/restore-item/" + id, { method: "POST" });
+        toast("♻ Đã restore");
+      }
+
+      /* MODAL */
+      const modal = document.getElementById("modal");
+      const modalImg = document.getElementById("modalImg");
+      function openModal(src) {
+        modal.style.display = "flex";
+        modalImg.src = src;
+      }
+      modal.onclick = () => (modal.style.display = "none");
+      document.getElementById("compareModal").onclick = () => {
+        document.getElementById("compareModal").style.display = "none";
+      };
+      /* COPY */
+      function copy(t) {
+        navigator.clipboard.writeText(t);
+        toast("Copied " + t);
+      }
+
+      /* TOAST */
+      function toast(t) {
+        const el = document.getElementById("toast");
+        el.innerText = t;
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 1500);
+      }
+      function changeMainImage(el) {
+        const card = el.closest(".card");
+
+        card.querySelector(".main-img").src = el.src;
+      }
+      function compareImages(resultImage) {
+        if (!previewUrls.length) {
+          toast("Chưa chọn ảnh");
+          return;
+        }
+
+        document.getElementById("compareQuery").src = previewUrls[0];
+
+        document.getElementById("compareResult").src = resultImage;
+
+        document.getElementById("compareModal").style.display = "flex";
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+pycache/ .py[cod] $py.class
+.venv/ venv/ env/
+cache/ .pytestcache/ .mypycache/ .ruff_cache/
+.env .env.* !.env.example
+.vscode/ .idea/ .swp .swo
+.DS_Store Thumbs.db desktop.ini
+*.log logs/
+build/ dist/ *.egg-info/
+.ipynb_checkpoints/
+.pt .pth .onnx .h5 .pkl .pickle
+uploads/* !uploads/.gitkeep
+products_sold/
+products_active/
+*.local config.local.bat
+.venv/
+__pycache__/
+uploads/
+cache/
+data/

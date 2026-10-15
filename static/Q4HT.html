@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Viewer PRO</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:#fff;
+}
+
+/* ===== HEADER ===== */
+.header{
+    padding:10px;
+    background:#000;
+    position:sticky;
+    top:0;
+    z-index:10;
+    text-align:center;
+    font-weight:bold;
+}
+
+/* ===== VIEWER ===== */
+.viewer{
+    max-width:900px;
+    margin:auto;
+    padding:10px;
+}
+
+.main-img{
+    width:100%;
+    max-height:60vh;
+    object-fit:contain;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+/* ===== CONTROL BAR ===== */
+.controls{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+.controls button{
+    flex:1;
+    padding:12px;
+    font-size:16px;
+    border:none;
+    border-radius:8px;
+    background:#0d6efd;
+    color:#fff;
+}
+
+/* ===== SEARCH ===== */
+.search{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+
+.search input{
+    flex:1;
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    text-align:center;
+}
+
+.search button{
+    padding:10px 15px;
+    border:none;
+    border-radius:8px;
+    background:#198754;
+    color:#fff;
+}
+
+/* ===== FILE NAME ===== */
+.filename{
+    margin-top:10px;
+    text-align:center;
+    font-size:18px;
+    color:#ccc;
+}
+
+/* ===== MODAL ===== */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.95);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+    overflow:hidden;
+}
+
+.modal img{
+    max-width:95%;
+    max-height:95%;
+    object-fit:contain;
+    transition:transform 0.1s;
+}
+
+/* CLOSE */
+.close-btn{
+    position:absolute;
+    top:15px;
+    right:20px;
+    font-size:30px;
+    cursor:pointer;
+}
+
+/* MOBILE FIX */
+@media(max-width:600px){
+    .controls button{
+        font-size:14px;
+        padding:10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">📸 Image Viewer</div>
+
+<div class="viewer">
+    <img id="mainImage" class="main-img">
+
+    <div class="controls">
+        <button onclick="prev()">⬅</button>
+        <button onclick="next()">➡</button>
+    </div>
+
+    <div class="filename" id="filename"></div>
+
+    <div class="search">
+        <input id="searchInput" placeholder="VD: TK-1">
+        <button onclick="goToImage()">Go</button>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <img id="modalImg">
+</div>
+
+<script>
+const API = window.location.origin;
+
+// PARAM
+const urlParams = new URLSearchParams(window.location.search);
+let currentFile = urlParams.get("img") || "TK-1.jpg";
+
+// nếu thiếu extension thì tự thêm
+if(currentFile && !currentFile.match(/\.\w+$/)){
+    currentFile += ".jpg";
+}
+
+// PARSE
+function parseFile(file){
+    const match = file.match(/(.+)-(\d+)\.(\w+)/);
+    if(!match) return null;
+    return {
+        prefix: match[1],
+        index: parseInt(match[2]),
+        ext: match[3]
+    };
+}
+
+let data = parseFile(currentFile);
+
+const img = document.getElementById("mainImage");
+const nameBox = document.getElementById("filename");
+const input = document.getElementById("searchInput");
+
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modalImg");
+
+// LOAD
+function loadImage(){
+    const url = `${API}/HangTonQ4/${data.prefix}-${data.index}.${data.ext}`;
+    img.src = url;
+    modalImg.src = url;
+    nameBox.textContent = `${data.prefix}-${data.index}`;
+}
+
+// NEXT PREV
+function next(){
+    data.index++;
+    loadImage();
+}
+function prev(){
+    if(data.index > 1) data.index--;
+    loadImage();
+}
+
+// SEARCH
+function goToImage(){
+    const value = input.value.trim();
+    const match = value.match(/(.+)-(\d+)/);
+    if(!match) return alert("Sai format");
+
+    data.prefix = match[1];
+    data.index = parseInt(match[2]);
+    loadImage();
+}
+
+// ENTER SEARCH
+input.addEventListener("keypress", e=>{
+    if(e.key==="Enter") goToImage();
+});
+
+// ===== MODAL =====
+img.onclick = ()=>{
+    modal.style.display="flex";
+    resetZoom();
+};
+
+function closeModal(){
+    modal.style.display="none";
+}
+
+modal.onclick = (e)=>{
+    if(e.target===modal) closeModal();
+};
+
+document.addEventListener("keydown",(e)=>{
+    if(e.key==="Escape") closeModal();
+});
+
+// ===== ZOOM + SCROLL PAN =====
+let scale = 1;
+
+let isDragging=false,startX,startY;
+
+// update transform
+function update(){
+    modalImg.style.transform = `scale(${scale})`;
+}
+// SCROLL ZOOM
+// ZOOM bằng scroll chuột
+modalImg.onwheel = (e)=>{
+    e.preventDefault();
+
+    if(e.ctrlKey){
+        // ZOOM
+        scale += e.deltaY < 0 ? 0.2 : -0.2;
+        scale = Math.max(0.5, Math.min(5, scale));
+        update();
+    }else{
+        // SCROLL xem ảnh khi đã zoom
+        modal.scrollTop += e.deltaY;
+        modal.scrollLeft += e.deltaX;
+    }
+};
+
+// DRAG
+modalImg.onmousedown=(e)=>{
+    isDragging=true;
+    startX=e.clientX-posX;
+    startY=e.clientY-posY;
+};
+
+document.onmousemove=(e)=>{
+    if(!isDragging) return;
+    posX=e.clientX-startX;
+    posY=e.clientY-startY;
+    update();
+};
+
+document.onmouseup=()=> isDragging=false;
+
+// DOUBLE CLICK
+modalImg.ondblclick=()=>{
+    scale = scale===1 ? 2 : 1;
+    posX=0;posY=0;
+    update();
+};
+
+// RESET
+function resetZoom(){
+    scale = 1;
+    update();
+    modal.scrollTop = 0;
+    modal.scrollLeft = 0;
+}
+// ===== SWIPE MOBILE =====
+let touchStartX=0;
+
+img.addEventListener("touchstart",e=>{
+    touchStartX = e.touches[0].clientX;
+});
+
+img.addEventListener("touchend",e=>{
+    let diff = e.changedTouches[0].clientX - touchStartX;
+    if(diff > 50) prev();
+    if(diff < -50) next();
+});
+
+// INIT
+loadImage();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Tìm Hàng Secondhand PRO</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, sans-serif;
+        background: #f5f7fb;
+        transition: 0.3s;
+      }
+      .dark {
+        background: #111;
+        color: #eee;
+      }
+      .dark .upload-box {
+        background: #222;
+        border-color: #444;
+      }
+      .dark .card {
+        background: #222;
+        border-color: #333;
+      }
+      .dark .detail-box {
+        background: #333;
+        color: #ccc;
+      }
+      .container {
+        max-width: 1300px;
+        margin: auto;
+        padding: 20px;
+      }
+      h1 {
+        color: #1e40af;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: #475569;
+      }
+
+      /* UPLOAD */
+      .upload-box {
+        border: 2px dashed #cbd5e1;
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        background: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+        user-select: none;
+      }
+      .upload-box.drag {
+        border-color: #2563eb;
+        background: #eff6ff;
+      }
+
+      /* PREVIEW */
+      .preview-list {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+        min-height: 10px;
+      }
+      .preview-item {
+        position: relative;
+        display: inline-block;
+      }
+      .preview-item img {
+        width: 90px;
+        height: 90px;
+        border-radius: 10px;
+        object-fit: cover;
+        border: 2px solid #e5e7eb;
+      }
+      .remove-preview {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ef4444;
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 22px;
+        text-align: center;
+        padding: 0;
+      }
+      .remove-preview:hover {
+        background: #dc2626;
+      }
+
+      /* BUTTONS */
+      button {
+        padding: 8px 14px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .btn-search {
+        background: #2563eb;
+        color: #fff;
+      }
+      .btn-search:disabled {
+        background: #93c5fd;
+        cursor: not-allowed;
+      }
+      .btn-clear {
+        background: #e5e7eb;
+      }
+      .btn-duplicate {
+        background: #f59e0b;
+        color: #fff;
+      }
+      .file-count {
+        font-size: 13px;
+        color: #6b7280;
+        margin-left: 10px;
+      }
+
+      /* RESULTS */
+      .results {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 20px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+      .top1 {
+        border: 2px solid #22c55e;
+      }
+      .card-img-wrap {
+        position: relative;
+        background: #f8fafc;
+        padding: 10px;
+      }
+
+      .main-img {
+        width: 100%;
+        height: 220px;
+        object-fit: contain;
+        cursor: pointer;
+        border-radius: 10px;
+        background: white;
+      }
+
+      .card-body {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+      .card-header .left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .card-header .right {
+        flex-shrink: 0;
+      }
+
+      .item-id {
+        font-weight: 700;
+        font-size: 14px;
+        white-space: nowrap;
+      }
+
+      .score {
+        font-size: 12px;
+        color: #6b7280;
+        white-space: nowrap;
+      }
+      .detail-box {
+        font-size: 12px;
+        color: #475569;
+        background: #f1f5f9;
+        padding: 6px 8px;
+        border-radius: 8px;
+      }
+      .actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+      }
+      .actions button {
+        flex: 1;
+        font-size: 12px;
+        padding: 6px;
+        border-radius: 8px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+      .green {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .gray {
+        background: #e5e7eb;
+      }
+
+      .copy-btn {
+        background: #111;
+        color: #fff;
+      }
+      .compare-btn {
+        background: #10b981;
+        color: white;
+      }
+      .manage-btn {
+        background: #ef4444;
+        color: #fff;
+      }
+      .restore-btn {
+        background: #22c55e;
+        color: #fff;
+      }
+
+      .load-more {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background: #2563eb;
+        color: #fff;
+        border-radius: 10px;
+      }
+
+      /* MODAL */
+      .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .modal img {
+        max-width: 90%;
+        max-height: 90%;
+      }
+      .compare-wrapper {
+        display: flex;
+        gap: 20px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 16px;
+        max-width: 1200px;
+        width: 90%;
+      }
+      .compare-side {
+        flex: 1;
+        text-align: center;
+      }
+      .compare-side h3 {
+        margin-bottom: 10px;
+      }
+      .compare-side img {
+        width: 100%;
+        max-height: 80vh;
+        object-fit: contain;
+        background: #f8fafc;
+        border-radius: 10px;
+      }
+      .dark .compare-wrapper {
+        background: #222;
+      }
+
+      /* THUMBNAILS */
+      .image-strip {
+        display: flex;
+        gap: 6px;
+        padding: 8px;
+        overflow-x: auto;
+      }
+      .thumb {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        flex-shrink: 0;
+      }
+      .thumb:hover,
+      .thumb.active {
+        border-color: #2563eb;
+      }
+
+      /* TOAST */
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #111;
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 8px;
+        opacity: 0;
+        transition: 0.3s;
+        z-index: 2000;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+
+      .toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #111;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+        z-index: 999;
+      }
+
+      /* SKELETON */
+      .skeleton {
+        height: 220px;
+        background: linear-gradient(90deg, #eee 25%, #ddd 50%, #eee 75%);
+        background-size: 200% 100%;
+        animation: loading 1.2s infinite;
+        border-radius: 10px;
+      }
+      @keyframes loading {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      .duplicate-group {
+        background: #fee2e2;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="toggle" onclick="toggleDark()">🌙</div>
+
+    <div class="container">
+      <h1>🔍 AI Tìm Hàng Secondhand</h1>
+
+      <div class="upload-box" id="uploadBox">
+        👉 Kéo thả, click hoặc Ctrl+V để dán ảnh
+        <input type="file" id="fileInput" hidden multiple accept="image/*" />
+      </div>
+
+      <div class="preview-list" id="previewList"></div>
+
+      <div
+        style="margin-top: 10px; display: flex; align-items: center; gap: 8px"
+      >
+        <button class="btn-search" id="btnSearch" onclick="upload()">
+          Tìm
+        </button>
+        <button class="btn-clear" onclick="clearAll()">Xóa</button>
+        <button class="btn-duplicate" onclick="detectDuplicates()">
+          Tìm trùng
+        </button>
+        <span class="file-count" id="fileCount"></span>
+      </div>
+
+      <div id="results" class="results"></div>
+
+      <button
+        id="loadMoreBtn"
+        class="load-more"
+        style="display: none"
+        onclick="loadMore()"
+      >
+        Xem thêm
+      </button>
+    </div>
+
+    <!-- IMAGE MODAL -->
+    <div class="modal" id="modal" onclick="closeModal()">
+      <img id="modalImg" />
+    </div>
+
+    <!-- COMPARE MODAL -->
+    <div class="modal" id="compareModal" onclick="closeCompare()">
+      <div class="compare-wrapper" onclick="event.stopPropagation()">
+        <div class="compare-side">
+          <h3>Ảnh đã chọn</h3>
+          <img id="compareQuery" />
+        </div>
+        <div class="compare-side">
+          <h3>Ảnh tìm thấy</h3>
+          <img id="compareResult" />
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      const API = window.location.origin;
+
+      // ================= STATE =================
+      let selectedFiles = [];
+      let results = [];
+      let currentPage = 1;
+      let pageSize = 20;
+      let hasMore = false;
+      let isSearching = false;
+
+      // ================= DARK MODE =================
+      function toggleDark() {
+        document.body.classList.toggle("dark");
+      }
+
+      // ================= UPLOAD BOX =================
+      const uploadBox = document.getElementById("uploadBox");
+      const fileInput = document.getElementById("fileInput");
+
+      uploadBox.addEventListener("click", () => fileInput.click());
+
+      uploadBox.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadBox.classList.add("drag");
+      });
+
+      uploadBox.addEventListener("dragleave", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadBox.classList.remove("drag");
+      });
+
+      uploadBox.addEventListener("drop", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadBox.classList.remove("drag");
+        addFiles(Array.from(e.dataTransfer.files));
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        addFiles(Array.from(e.target.files));
+        fileInput.value = "";
+      });
+
+      // ================= PASTE =================
+      document.addEventListener("paste", (e) => {
+        const imageFiles = [];
+        for (const item of e.clipboardData.items) {
+          if (item.type.startsWith("image/")) {
+            const f = item.getAsFile();
+            if (f) imageFiles.push(f);
+          }
+        }
+        if (imageFiles.length) {
+          addFiles(imageFiles);
+          toast("📋 Đã dán " + imageFiles.length + " ảnh");
+        }
+      });
+
+      // ================= FILE MANAGEMENT =================
+      function isImageFile(file) {
+        if (file.type && file.type.startsWith("image/")) return true;
+        const name = (file.name || "").toLowerCase();
+        return [".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"].some((ext) =>
+          name.endsWith(ext),
+        );
+      }
+
+      function addFiles(newFiles) {
+        const validFiles = newFiles.filter(isImageFile);
+
+        if (!validFiles.length) {
+          toast("⚠️ Không có file ảnh hợp lệ");
+          return;
+        }
+
+        const mapped = validFiles.map((file) => ({
+          id: crypto.randomUUID
+            ? crypto.randomUUID()
+            : Math.random().toString(36).slice(2),
+          file: file,
+          preview: URL.createObjectURL(file),
+        }));
+
+        selectedFiles = [...selectedFiles, ...mapped];
+        renderPreviews();
+        toast("✅ Đã thêm " + validFiles.length + " ảnh");
+      }
+
+      function removeFile(id) {
+        const item = selectedFiles.find((x) => x.id === id);
+        if (item && item.preview) {
+          URL.revokeObjectURL(item.preview);
+        }
+        selectedFiles = selectedFiles.filter((x) => x.id !== id);
+        renderPreviews();
+      }
+
+      function clearAll() {
+        selectedFiles.forEach((item) => {
+          if (item.preview) URL.revokeObjectURL(item.preview);
+        });
+
+        selectedFiles = [];
+        results = [];
+        currentPage = 1;
+        hasMore = false;
+
+        document.getElementById("previewList").innerHTML = "";
+        document.getElementById("results").innerHTML = "";
+        document.getElementById("loadMoreBtn").style.display = "none";
+        updateFileCount();
+      }
+
+      // ================= PREVIEW =================
+      function renderPreviews() {
+        const box = document.getElementById("previewList");
+        box.innerHTML = "";
+
+        selectedFiles.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = "preview-item";
+
+          const img = document.createElement("img");
+          img.src = item.preview;
+          img.onclick = () => openModal(item.preview);
+          img.onerror = () => {
+            img.src =
+              "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='90'><rect width='90' height='90' fill='%23fee2e2'/><text x='50%25' y='50%25' text-anchor='middle' font-size='12' dy='.3em'>Lỗi</text></svg>";
+          };
+
+          const btn = document.createElement("button");
+          btn.className = "remove-preview";
+          btn.textContent = "×";
+          btn.onclick = (e) => {
+            e.stopPropagation();
+            removeFile(item.id);
+          };
+
+          div.appendChild(img);
+          div.appendChild(btn);
+          box.appendChild(div);
+        });
+
+        updateFileCount();
+      }
+
+      function updateFileCount() {
+        const el = document.getElementById("fileCount");
+        if (selectedFiles.length > 0) {
+          el.textContent = selectedFiles.length + " ảnh đã chọn";
+        } else {
+          el.textContent = "";
+        }
+      }
+
+      // ================= SEARCH =================
+      async function upload() {
+        if (!selectedFiles.length) {
+          toast("⚠️ Chưa chọn ảnh");
+          return;
+        }
+        if (isSearching) return;
+
+        isSearching = true;
+        document.getElementById("btnSearch").disabled = true;
+        showLoading();
+        currentPage = 1;
+
+        try {
+          const fd = new FormData();
+          selectedFiles.forEach((item) => fd.append("files", item.file));
+          fd.append("page", currentPage);
+          fd.append("page_size", pageSize);
+
+          const res = await fetch(API + "/search-multi", {
+            method: "POST",
+            body: fd,
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || "Server error " + res.status);
+          }
+
+          results = data.results || [];
+          hasMore = data.has_more || false;
+
+          draw(results);
+          toggleLoadMore();
+        } catch (err) {
+          toast("❌ Lỗi: " + err.message);
+          document.getElementById("results").innerHTML =
+            "<div style='grid-column:1/-1;text-align:center;color:#ef4444'>❌ " +
+            err.message +
+            "</div>";
+        } finally {
+          isSearching = false;
+          document.getElementById("btnSearch").disabled = false;
+        }
+      }
+
+      // ================= LOAD MORE =================
+      async function loadMore() {
+        if (isSearching) return;
+        isSearching = true;
+        currentPage++;
+
+        try {
+          const fd = new FormData();
+          selectedFiles.forEach((item) => fd.append("files", item.file));
+          fd.append("page", currentPage);
+          fd.append("page_size", pageSize);
+
+          const res = await fetch(API + "/search-multi", {
+            method: "POST",
+            body: fd,
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || "Server error " + res.status);
+          }
+
+          results = [...results, ...(data.results || [])];
+          hasMore = data.has_more || false;
+
+          draw(results);
+          toggleLoadMore();
+        } catch (err) {
+          currentPage--;
+          toast("❌ Lỗi: " + err.message);
+        } finally {
+          isSearching = false;
+        }
+      }
+
+      function toggleLoadMore() {
+        document.getElementById("loadMoreBtn").style.display = hasMore
+          ? "block"
+          : "none";
+      }
+
+      // ================= LOADING SKELETON =================
+      function showLoading() {
+        const box = document.getElementById("results");
+        box.innerHTML = "";
+        for (let i = 0; i < 8; i++) {
+          box.innerHTML +=
+            '<div class="card"><div class="skeleton"></div></div>';
+        }
+      }
+
+      // ================= DUPLICATE DETECTION =================
+      async function detectDuplicates() {
+        const threshold = prompt("Nhập threshold (0.9 - 0.99):", "0.95");
+        if (!threshold) return;
+
+        showLoading();
+
+        try {
+          const res = await fetch(
+            API + "/detect-duplicates?threshold=" + threshold,
+          );
+          const data = await res.json();
+
+          const box = document.getElementById("results");
+          box.innerHTML = "";
+
+          if (!data.duplicates || !data.duplicates.length) {
+            box.innerHTML =
+              "<div style='grid-column:1/-1;text-align:center'>✅ Không có ảnh trùng</div>";
+            return;
+          }
+
+          data.duplicates.forEach((group) => {
+            box.innerHTML +=
+              '<div class="duplicate-group"><b>Nhóm trùng:</b> ' +
+              group.join(", ") +
+              "</div>";
+          });
+        } catch (err) {
+          toast("❌ Lỗi: " + err.message);
+        }
+      }
+
+      // ================= DRAW RESULTS =================
+      function draw(arr) {
+        const box = document.getElementById("results");
+        box.innerHTML = "";
+
+        if (!arr.length) {
+          box.innerHTML =
+            "<div style='grid-column:1/-1;text-align:center'>❌ Không tìm thấy</div>";
+          return;
+        }
+
+        arr.forEach((item, index) => {
+          const imgs =
+            item.images && item.images.length ? item.images : [item.image_url];
+
+          const firstImg = API + "/" + imgs[0].replace(/^\/+/, "");
+
+          const card = document.createElement("div");
+          card.className = "card" + (index === 0 ? " top1" : "");
+
+          // Thumbnails
+          let thumbsHtml = "";
+          imgs.forEach((img) => {
+            const src = API + "/" + img.replace(/^\/+/, "");
+            thumbsHtml +=
+              '<img class="thumb" src="' +
+              src +
+              '" onclick="changeMainImage(this)" onerror="this.style.display=\'none\'">';
+          });
+
+          card.innerHTML =
+            '<div class="card-img-wrap">' +
+            '<img class="main-img" src="' +
+            firstImg +
+            '" ' +
+            'onclick="openModal(this.src)" ' +
+            "onerror=\"this.src='data:image/svg+xml," +
+            "<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22>" +
+            "<rect width=%22200%22 height=%22200%22 fill=%22%23f1f5f9%22/>" +
+            "<text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 font-size=%2216%22>No Image</text>" +
+            "</svg>'\">" +
+            '<div class="image-strip">' +
+            thumbsHtml +
+            "</div>" +
+            "</div>" +
+            '<div class="card-body">' +
+            '<div class="card-header">' +
+            '<div class="left">' +
+            '<div class="item-id">#' +
+            item.item_id +
+            "</div>" +
+            '<span class="badge ' +
+            (item.score > 0.9 ? "green" : "gray") +
+            '">' +
+            (item.score > 0.9 ? "TOP MATCH" : "GẦN ĐÚNG") +
+            "</span>" +
+            "</div>" +
+            '<div class="right">' +
+            '<div class="score">' +
+            (item.score * 100).toFixed(1) +
+            "%</div>" +
+            "</div>" +
+            "</div>" +
+            '<div class="detail-box">' +
+            '<div class="detail-row">' +
+            "<span>🗓 " +
+            (item.modified_date || "N/A") +
+            "</span>" +
+            "<span>📦 " +
+            imgs.length +
+            " tấm</span>" +
+            "</div>" +
+            "</div>" +
+            '<div class="actions">' +
+            '<button class="copy-btn" onclick="copy(\'' +
+            item.item_id +
+            "')\">" +
+            "Copy</button>" +
+            '<button class="compare-btn" onclick="compareImages(\'' +
+            firstImg +
+            "')\">" +
+            "So sánh</button>" +
+            '<button class="manage-btn" onclick="moveToSold(\'' +
+            item.item_id +
+            "')\">" +
+            "SOLD</button>" +
+            '<button class="manage-btn" onclick="deleteItem(\'' +
+            item.item_id +
+            "')\">" +
+            "Xóa</button>" +
+            "</div>" +
+            "</div>";
+
+          box.appendChild(card);
+        });
+      }
+
+      // ================= ACTIONS =================
+      async function moveToSold(id) {
+        try {
+          await fetch(API + "/move-to-sold/" + id, { method: "POST" });
+          toast("✅ Đã chuyển SOLD: " + id);
+        } catch (err) {
+          toast("❌ Lỗi: " + err.message);
+        }
+      }
+
+      async function deleteItem(id) {
+        if (!confirm("Xóa sản phẩm " + id + "?")) return;
+        try {
+          await fetch(API + "/delete-item/" + id, { method: "POST" });
+          toast("🗑 Đã xóa: " + id);
+        } catch (err) {
+          toast("❌ Lỗi: " + err.message);
+        }
+      }
+
+      async function restoreItem(id) {
+        try {
+          await fetch(API + "/restore-item/" + id, { method: "POST" });
+          toast("♻ Đã restore: " + id);
+        } catch (err) {
+          toast("❌ Lỗi: " + err.message);
+        }
+      }
+
+      // ================= IMAGE HELPERS =================
+      function changeMainImage(el) {
+        const card = el.closest(".card");
+        if (!card) return;
+
+        card.querySelector(".main-img").src = el.src;
+
+        card
+          .querySelectorAll(".thumb")
+          .forEach((t) => t.classList.remove("active"));
+        el.classList.add("active");
+      }
+
+      function compareImages(resultImage) {
+        if (!selectedFiles.length) {
+          toast("⚠️ Chưa chọn ảnh để so sánh");
+          return;
+        }
+
+        document.getElementById("compareQuery").src = selectedFiles[0].preview;
+        document.getElementById("compareResult").src = resultImage;
+        document.getElementById("compareModal").style.display = "flex";
+      }
+
+      // ================= MODAL =================
+      function openModal(src) {
+        document.getElementById("modalImg").src = src;
+        document.getElementById("modal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("modal").style.display = "none";
+      }
+
+      function closeCompare() {
+        document.getElementById("compareModal").style.display = "none";
+      }
+
+      document.getElementById("modal").addEventListener("click", closeModal);
+
+      document
+        .getElementById("compareModal")
+        .addEventListener("click", closeCompare);
+
+      document
+        .querySelector(".compare-wrapper")
+        .addEventListener("click", (e) => e.stopPropagation());
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeModal();
+          closeCompare();
+        }
+      });
+
+      // ================= COPY =================
+      function copy(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => {
+            toast("📋 Copied: " + text);
+          });
+        } else {
+          const el = document.createElement("textarea");
+          el.value = text;
+          document.body.appendChild(el);
+          el.select();
+          document.execCommand("copy");
+          document.body.removeChild(el);
+          toast("📋 Copied: " + text);
+        }
+      }
+
+      // ================= TOAST =================
+      function toast(msg) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(el._tid);
+        el._tid = setTimeout(() => el.classList.remove("show"), 2000);
+      }
+    </script>
+  </body>
+</html>
