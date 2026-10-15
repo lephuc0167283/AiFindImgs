@@ -1,6 +1,7 @@
 import os
 import re
 from collections import defaultdict
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -141,7 +142,7 @@ def search_multi(file_paths, page=1, page_size=20):
             "score": float(score),
             "image_url": f"/{file_path}",
             "images": [f"/{path}" for path in images],
-            "modified_date": get_date_from_filename(file_path),
+            "modified_date": get_file_modified_date(file_path),
             "is_confident": score > 0.9,
         })
 
@@ -240,7 +241,6 @@ def detect_duplicates(threshold: float = 0.95):
     return duplicates
 
 
-def get_date_from_filename(file_path):
-    filename = os.path.basename(file_path)
-    match = re.search(r"\((\d{2}-\d{2}-\d{4})\)", filename)
-    return match.group(1) if match else "N/A"
+def get_file_modified_date(file_path):
+    modified_at = os.path.getmtime(file_path)
+    return datetime.fromtimestamp(modified_at).strftime("%d-%m-%Y %H:%M")
