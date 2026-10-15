@@ -1,9 +1,6 @@
-import numpy as np
 import torch
-import open_clip
 import os
 import re
-from datetime import datetime
 from PIL import Image, ImageOps
 from collections import defaultdict
 from index_manager import IndexManager
@@ -25,53 +22,78 @@ model.eval()
 def encode_img(path):
     img = Image.open(path)
     img = ImageOps.exif_transpose(img).convert("RGB")
-    img_t = preprocess(img).unsqueeze(0).to(device)
+    width, height = img.size
+    views = [img]
 
-    with torch.no_grad():
-        with torch.amp.autocast("cuda"):
+    for ratio in (0.8, 0.6):
+        crop_width = max(1, int(width * ratio))
+        crop_height = max(1, int(height * ratio))
+        left = (width - crop_width) // 2
+        top = (height - crop_height) // 2
+        views.append(img.crop((left, top, left + crop_width, top + crop_height)))
+
+    img_t = torch.stack([preprocess(view) for view in views]).to(device)
+
+    with torch.inference_mode():
+        with torch.amp.autocast(device_type=device, enabled=device == "cuda"):
             vec = model.encode_image(img_t)
             vec = vec / vec.norm(dim=-1, keepdim=True)
 
     return vec.float().cpu().numpy()
 
 def search_multi(file_paths, page=1, page_size=20):
-
-    all_scores = defaultdict(list)
+    page = max(1, page)
+    page_size = max(1, page_size)
     index, meta = get_index()
     if index is None or index.ntotal == 0:
         return {"results": [], "total": 0, "has_more": False}
-    for path in file_paths:
-        q_vec = encode_img(path)    
 
-        scores, indices = index.search(q_vec, 100)
+    query_vectors = []
+    query_ids = []
+    view_weights = []
+    for query_id, path in enumerate(file_paths):
+        vectors = encode_img(path)
+        for view_id, vector in enumerate(vectors):
+            query_vectors.append(vector)
+            query_ids.append(query_id)
+            view_weights.append(1.0 if view_id == 0 else 0.97)
 
-        for s, idx in zip(scores[0], indices[0]):
-            if idx != -1:
-                item_id = meta[idx]["item_id"]
-                all_scores[item_id].append(float(s))
+    scores_by_item = defaultdict(lambda: [float("-inf")] * len(file_paths))
+    for vector, query_id, weight in zip(query_vectors, query_ids, view_weights):
+        scores, indices = index.search(vector.reshape(1, -1), index.ntotal)
+        for score, idx in zip(scores[0], indices[0]):
+            if idx == -1:
+                continue
+            item_id = meta[idx]["item_id"]
+            scores_by_item[item_id][query_id] = max(
+                scores_by_item[item_id][query_id],
+                float(score) * weight
+            )
 
     refined = []
-
-    for item_id, scores in all_scores.items():
-        max_score = max(scores)
-        avg_score = sum(scores) / len(scores)
-        boost = len(scores) * 0.02
-        final_score = (max_score * 0.6 + avg_score * 0.4) + boost
+    for item_id, query_scores in scores_by_item.items():
+        matched_scores = [score for score in query_scores if score != float("-inf")]
+        max_score = max(matched_scores)
+        avg_score = sum(matched_scores) / len(matched_scores)
+        final_score = max_score * 0.6 + avg_score * 0.4
         refined.append((item_id, final_score))
 
     refined.sort(key=lambda x: x[1], reverse=True)
 
     total_results = len(refined)
 
-    # ✅ Pagination
     start = (page - 1) * page_size
     end = start + page_size
     paged = refined[start:end]
 
+    images_by_item = defaultdict(list)
+    for entry in meta:
+        images_by_item[entry["item_id"]].append(entry["path"])
+
     results = []
 
     for item_id, score in paged:
-        images = [m["path"] for m in meta if m["item_id"] == item_id]
+        images = images_by_item[item_id]
 
         file_path = images[0]
 
