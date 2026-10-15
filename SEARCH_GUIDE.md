@@ -15,15 +15,22 @@ From the project directory:
 .\.venv\Scripts\python.exe -m uvicorn app:app --reload
 ```
 
-The builder updates only new, changed, or removed images. Run it again after
-changing the model or OCR setting. Use `build_index.py --force` to re-encode all
-active images for the current settings.
+The server loads the CLIP model on the first image-search request rather than
+at startup. The FAISS index is still loaded into memory when the server starts.
+
+The builder updates only new, changed, or removed images and skips loading the
+CLIP model when no image needs encoding. Run it again after changing the model
+or OCR setting. Use `build_index.py --force` to re-encode all active images for
+the current settings.
 GPU builds batch 16 images at a time (CPU builds retain batches of 8) and
 automatically split a GPU batch if memory is insufficient. When OCR is disabled,
 each image is decoded only once during indexing.
-Build progress reports the processed percentage and image counts. A checkpoint
-is saved after every 1,000 successfully indexed images; the completed index is
-saved again at the end.
+Build progress reports the processed percentage, indexed/skipped counts, and
+stage timings. Image loading is pipelined with a bounded queue to limit RAM use.
+A checkpoint is saved after every 3,000 successfully indexed images; the
+completed index is saved again at the end. The final report checks that indexed
+images, vectors, and metadata agree and warns if any active images remain out
+of the index.
 
 JPEG XL (`.jxl`) images are supported in `products_active`; the builder reads
 them directly without converting the originals. Install `requirements.txt`
@@ -93,3 +100,6 @@ Image paths in the manifest are relative to that manifest. Run:
 Compare Recall@1/5/10, mean reciprocal rank, and latency across models using the
 same manifest. Without labeled real-world queries, no setting can be claimed to
 be more accurate than another.
+Keep a representative, held-out query manifest and compare it before changing
+the model, number of retrieval views, FAISS candidate count, or reranking
+weights; those settings can change search results.

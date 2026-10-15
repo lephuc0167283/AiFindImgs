@@ -1,5 +1,6 @@
 import os
 import re
+import threading
 from collections import defaultdict
 from datetime import datetime
 
@@ -13,10 +14,23 @@ from model_loader import get_model
 from ocr_search import extract_text, text_similarity
 from search_config import OCR_ENABLED, SEARCH_CANDIDATES
 
-model, preprocess = get_model()
 device = "cuda" if torch.cuda.is_available() else "cpu"
-model = model.to(device)
-model.eval()
+_model = None
+_preprocess = None
+_model_lock = threading.Lock()
+
+
+def _get_model():
+    global _model, _preprocess
+    if _model is None:
+        with _model_lock:
+            if _model is None:
+                model, preprocess = get_model()
+                model = model.to(device)
+                model.eval()
+                _model = model
+                _preprocess = preprocess
+    return _model, _preprocess
 
 
 def get_index():
@@ -25,6 +39,7 @@ def get_index():
 
 
 def _encode_tensors(tensors):
+    model, _ = _get_model()
     try:
         with torch.inference_mode():
             with torch.amp.autocast(device_type=device, enabled=device == "cuda"):
@@ -47,6 +62,7 @@ def _encode_tensors(tensors):
 
 
 def encode_img(path):
+    _, preprocess = _get_model()
     with Image.open(path) as source:
         image = ImageOps.exif_transpose(source).convert("RGB")
     tensors = torch.stack([preprocess(view) for view in retrieval_views(image)])
