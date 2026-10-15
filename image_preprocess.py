@@ -17,13 +17,31 @@ def load_and_fix_image(path: str) -> Image.Image:
 
 def center_crop_pil(img: Image.Image, ratio: float = 0.9) -> Image.Image:
     w, h = img.size
-    new_w = int(w * ratio)
-    new_h = int(h * ratio)
+    new_w = max(1, int(w * ratio))
+    new_h = max(1, int(h * ratio))
     left = max((w - new_w) // 2, 0)
     top = max((h - new_h) // 2, 0)
     right = left + new_w
     bottom = top + new_h
     return img.crop((left, top, right, bottom))
+
+
+def retrieval_views(img: Image.Image) -> list[Image.Image]:
+    width, height = img.size
+    views = [img, center_crop_pil(img, 0.8)]
+    crop_width = max(1, int(width * 0.72))
+    crop_height = max(1, int(height * 0.72))
+    offsets = (
+        (0, 0),
+        (width - crop_width, 0),
+        (0, height - crop_height),
+        (width - crop_width, height - crop_height),
+    )
+    views.extend(
+        img.crop((left, top, left + crop_width, top + crop_height))
+        for left, top in offsets
+    )
+    return views
 
 
 def remove_background_pil(img: Image.Image) -> Image.Image:

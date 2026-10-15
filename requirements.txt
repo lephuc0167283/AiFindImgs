@@ -8,3 +8,4 @@ open_clip_torch
 python-multipart
 rembg
 onnxruntime
+rapidocr-onnxruntime

@@ -1,5 +1,6 @@
 import torch
 import open_clip
+from search_config import MODEL_NAME, PRETRAINED
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -10,8 +11,8 @@ def get_model():
     global _model, _preprocess
     if _model is None:
         model, _, preprocess = open_clip.create_model_and_transforms(
-            "ViT-L-14",
-            pretrained="laion2b_s32b_b82k"
+            MODEL_NAME,
+            pretrained=PRETRAINED
         )
         model = model.to(device)
         model.eval()

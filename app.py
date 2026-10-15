@@ -14,11 +14,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from search_engine import search_multi
-from index_manager import IndexManager
+from search_engine import index_images, search_multi
+from index_manager import get_manager
 from search_engine import detect_duplicates
 app = FastAPI()
-manager = IndexManager()
+manager = get_manager()
 
 # ================= MIDDLEWARE =================
 app.add_middleware(
@@ -113,17 +113,18 @@ def move_to_sold(item_id: str):
 @app.post("/restore-item/{item_id}")
 def restore_item(item_id: str):
 
-    restored = False
+    restored_paths = []
 
     for file in os.listdir("products_sold"):
         if file.startswith(item_id):
-            shutil.move(
-                f"products_sold/{file}",
-                f"products_active/{file}"
-            )
-            restored = True
+            active_path = f"products_active/{file}"
+            shutil.move(f"products_sold/{file}", active_path)
+            restored_paths.append(active_path)
 
-    return {"status": "restored" if restored else "not_found"}
+    if restored_paths:
+        index_images(restored_paths)
+
+    return {"status": "restored" if restored_paths else "not_found"}
 
 # ================= DELETE =================
 @app.post("/delete-item/{item_id}")
