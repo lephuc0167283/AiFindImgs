@@ -378,45 +378,900 @@
         border-radius: 8px;
         margin-bottom: 10px;
       }
+
+      :root {
+        color-scheme: light;
+        --page: #f4f6f4;
+        --surface: #ffffff;
+        --surface-soft: #f7f9f7;
+        --ink: #17241e;
+        --muted: #758078;
+        --line: #e5eae6;
+        --accent: #19734b;
+        --accent-dark: #125b3b;
+        --accent-soft: #e8f4ed;
+        --shadow: 0 18px 55px rgba(27, 53, 39, 0.08);
+      }
+
+      body {
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse at 8% 0%, rgba(202, 230, 211, 0.4), transparent 32rem),
+          var(--page);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        transition: background 0.25s, color 0.25s;
+      }
+
+      button {
+        min-height: 42px;
+        padding: 10px 16px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        transition: transform 0.18s, background 0.18s, box-shadow 0.18s, border-color 0.18s;
+      }
+
+      button:not(:disabled):hover {
+        transform: translateY(-1px);
+      }
+
+      button:focus-visible,
+      input:focus-visible,
+      .upload-box:focus-visible {
+        outline: 3px solid rgba(25, 115, 75, 0.28);
+        outline-offset: 3px;
+      }
+
+      .container {
+        width: min(100% - 48px, 1320px);
+        padding: 32px 0 72px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 48px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 11px;
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 38px;
+        height: 38px;
+        place-items: center;
+        border-radius: 13px;
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 7px 18px rgba(25, 115, 75, 0.2);
+        font-size: 19px;
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .topbar-note {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .toggle {
+        position: static;
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: var(--surface);
+        color: var(--ink);
+        box-shadow: 0 3px 10px rgba(27, 53, 39, 0.04);
+        font-size: 17px;
+      }
+
+      .hero {
+        max-width: 740px;
+        margin: 0 auto 30px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin-bottom: 14px;
+        padding: 7px 11px;
+        border: 1px solid #d7e9dc;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.75);
+        color: var(--accent-dark);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #36a66b;
+        box-shadow: 0 0 0 4px rgba(54, 166, 107, 0.12);
+      }
+
+      h1 {
+        margin: 0;
+        color: var(--ink);
+        font-size: clamp(34px, 5vw, 54px);
+        font-weight: 800;
+        letter-spacing: -0.055em;
+        line-height: 1.08;
+      }
+
+      .hero-copy {
+        max-width: 540px;
+        margin: 15px auto 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.7;
+      }
+
+      .search-panel {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .upload-box {
+        display: flex;
+        min-height: 228px;
+        align-items: center;
+        justify-content: center;
+        padding: 28px;
+        border: 1.5px dashed #bed3c4;
+        border-radius: 17px;
+        background: linear-gradient(145deg, #fbfdfb, #f4f8f4);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .upload-box:hover,
+      .upload-box.drag {
+        border-color: var(--accent);
+        background: #eff8f1;
+      }
+
+      .upload-content {
+        max-width: 420px;
+        text-align: center;
+        pointer-events: none;
+      }
+
+      .upload-icon {
+        display: grid;
+        width: 58px;
+        height: 58px;
+        place-items: center;
+        margin: 0 auto 14px;
+        border: 1px solid #dcebe0;
+        border-radius: 19px;
+        background: #fff;
+        color: var(--accent);
+        box-shadow: 0 8px 22px rgba(27, 53, 39, 0.06);
+        font-size: 25px;
+      }
+
+      .upload-title {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .upload-hint {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .upload-hint strong {
+        color: var(--accent);
+      }
+
+      .preview-list {
+        min-height: 0;
+        gap: 12px;
+        padding: 4px 3px 2px;
+      }
+
+      .preview-item {
+        width: 78px;
+        height: 78px;
+        margin-top: 7px;
+      }
+
+      .preview-item img {
+        width: 100%;
+        height: 100%;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        background: var(--surface-soft);
+        cursor: zoom-in;
+      }
+
+      .remove-preview {
+        top: -7px;
+        right: -7px;
+        width: 23px;
+        height: 23px;
+        border: 2px solid #fff;
+        line-height: 18px;
+      }
+
+      .search-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 13px 2px 2px;
+      }
+
+      .btn-search {
+        min-width: 136px;
+        background: var(--accent);
+        color: #fff;
+        box-shadow: 0 7px 15px rgba(25, 115, 75, 0.18);
+      }
+
+      .btn-search:hover:not(:disabled) {
+        background: var(--accent-dark);
+        box-shadow: 0 9px 19px rgba(25, 115, 75, 0.24);
+      }
+
+      .btn-search:disabled {
+        background: #92b9a0;
+        cursor: wait;
+      }
+
+      .btn-clear {
+        border-color: var(--line);
+        background: var(--surface);
+        color: #59665e;
+      }
+
+      .btn-duplicate {
+        border-color: #f0e3c4;
+        background: #fffaf0;
+        color: #92621a;
+      }
+
+      .file-count {
+        margin-left: auto;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .threshold-control {
+        display: inline-flex;
+        min-height: 42px;
+        align-items: center;
+        gap: 7px;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface);
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .threshold-control input {
+        width: 42px;
+        border: 0;
+        background: transparent;
+        color: var(--ink);
+        font: inherit;
+        font-weight: 800;
+      }
+
+      .results-section {
+        margin-top: 44px;
+      }
+
+      .results-heading {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .results-title {
+        margin: 0;
+        color: var(--ink);
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+      }
+
+      .results-subtitle {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .results-count {
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      .results {
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 235px), 1fr));
+        gap: 18px;
+        margin-top: 0;
+      }
+
+      .card {
+        border-color: var(--line);
+        border-radius: 18px;
+        box-shadow: 0 4px 16px rgba(27, 53, 39, 0.035);
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        border-color: #c9ddcf;
+        box-shadow: 0 16px 32px rgba(27, 53, 39, 0.1);
+      }
+
+      .top1 {
+        border: 1px solid #b8d9c2;
+        box-shadow: 0 7px 22px rgba(39, 116, 72, 0.09);
+      }
+
+      .card-img-wrap {
+        padding: 10px;
+        background: var(--surface-soft);
+      }
+
+      .main-img {
+        height: 230px;
+        border: 1px solid rgba(23, 36, 30, 0.04);
+        background: var(--surface);
+      }
+
+      .main-img.image-error {
+        background: #edf1ed;
+        color: var(--muted);
+        object-fit: contain;
+      }
+
+      .image-strip {
+        min-height: 50px;
+        padding: 9px 1px 1px;
+      }
+
+      .thumb {
+        width: 43px;
+        height: 43px;
+        border-color: transparent;
+        border-radius: 9px;
+      }
+
+      .card-body {
+        flex: 1;
+        gap: 11px;
+        padding: 14px;
+      }
+
+      .card-header .left {
+        flex-wrap: wrap;
+      }
+
+      .item-id {
+        overflow: hidden;
+        color: var(--ink);
+        font-size: 13px;
+        text-overflow: ellipsis;
+      }
+
+      .score {
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .badge {
+        padding: 4px 8px;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+      }
+
+      .green {
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+      }
+
+      .gray {
+        background: #f0f2f0;
+        color: #68736c;
+      }
+
+      .detail-box {
+        padding: 9px 10px;
+        border: 1px solid #edf0ed;
+        border-radius: 10px;
+        background: #fafbfa;
+        color: #6f7b72;
+      }
+
+      .detail-row {
+        color: inherit;
+        font-size: 11px;
+      }
+
+      .actions {
+        gap: 7px;
+        margin-top: auto;
+        padding-top: 2px;
+      }
+
+      .actions button {
+        min-height: 34px;
+        padding: 7px 8px;
+        border-radius: 9px;
+        font-size: 10px;
+      }
+
+      .copy-btn {
+        background: #edf2ee;
+        color: #435249;
+      }
+
+      .compare-btn {
+        background: var(--accent-soft);
+        color: var(--accent-dark);
+      }
+
+      .manage-btn {
+        background: #fff0ed;
+        color: #b14e3c;
+      }
+
+      .load-more {
+        min-width: 180px;
+        margin: 28px auto 0;
+        background: var(--accent);
+        box-shadow: 0 7px 15px rgba(25, 115, 75, 0.14);
+      }
+
+      .empty-state {
+        grid-column: 1 / -1;
+        padding: 62px 20px;
+        border: 1px dashed var(--line);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.55);
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .empty-state-icon {
+        display: block;
+        margin-bottom: 12px;
+        font-size: 30px;
+      }
+
+      .empty-state strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--ink);
+        font-size: 15px;
+      }
+
+      .empty-state span:last-child {
+        font-size: 12px;
+      }
+
+      .skeleton {
+        min-height: 280px;
+        border-radius: 17px;
+        background: linear-gradient(90deg, #edf1ed 25%, #e3e9e4 50%, #edf1ed 75%);
+        background-size: 200% 100%;
+      }
+
+      .modal {
+        padding: 20px;
+        background: rgba(13, 22, 17, 0.88);
+        backdrop-filter: blur(8px);
+      }
+
+      .modal img {
+        border-radius: 12px;
+      }
+
+      .compare-wrapper {
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: var(--surface);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+      }
+
+      .compare-side h3 {
+        color: var(--ink);
+        font-size: 14px;
+      }
+
+      .toast {
+        right: 24px;
+        bottom: 24px;
+        max-width: min(420px, calc(100vw - 32px));
+        padding: 13px 17px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 13px;
+        background: #1b2d22;
+        box-shadow: 0 14px 36px rgba(12, 26, 17, 0.22);
+        font-size: 13px;
+      }
+
+      .duplicate-group {
+        grid-column: 1 / -1;
+        padding: 16px;
+        border: 1px solid #f0d2cf;
+        border-radius: 14px;
+        background: #fff7f5;
+        color: #863d34;
+      }
+
+      .dark {
+        --page: #111914;
+        --surface: #1b241e;
+        --surface-soft: #202b24;
+        --ink: #edf4ee;
+        --muted: #a1afa4;
+        --line: #303c33;
+        --accent: #63c28a;
+        --accent-dark: #a2e3b8;
+        --accent-soft: #243b2d;
+        --shadow: 0 18px 55px rgba(0, 0, 0, 0.2);
+        color: var(--ink);
+        background:
+          radial-gradient(ellipse at 8% 0%, rgba(45, 91, 60, 0.2), transparent 32rem),
+          var(--page);
+      }
+
+      .dark .brand,
+      .dark h1,
+      .dark .results-title,
+      .dark .item-id,
+      .dark .compare-side h3 {
+        color: var(--ink);
+      }
+
+      .dark .search-panel,
+      .dark .toggle,
+      .dark .threshold-control,
+      .dark .btn-clear,
+      .dark .upload-icon {
+        border-color: var(--line);
+        background: var(--surface);
+        color: var(--ink);
+      }
+
+      .dark .search-panel {
+        background: rgba(27, 36, 30, 0.88);
+      }
+
+      .dark .upload-box {
+        border-color: #3c5945;
+        background: linear-gradient(145deg, #202b24, #1b261f);
+        color: var(--ink);
+      }
+
+      .dark .upload-box:hover,
+      .dark .upload-box.drag {
+        border-color: var(--accent);
+        background: #24382a;
+      }
+
+      .dark .eyebrow {
+        border-color: var(--line);
+        background: var(--surface);
+        color: var(--accent-dark);
+      }
+
+      .dark .btn-duplicate {
+        border-color: #57492d;
+        background: #342d20;
+        color: #efd298;
+      }
+
+      .dark .card {
+        border-color: var(--line);
+        background: var(--surface);
+      }
+
+      .dark .card-img-wrap,
+      .dark .main-img,
+      .dark .main-img.image-error {
+        border-color: var(--line);
+        background: #17201a;
+      }
+
+      .dark .detail-box,
+      .dark .copy-btn {
+        border-color: var(--line);
+        background: #222d25;
+        color: #c3d0c5;
+      }
+
+      .dark .gray {
+        background: #303a32;
+        color: #c2ccc4;
+      }
+
+      .dark .empty-state {
+        border-color: var(--line);
+        background: rgba(27, 36, 30, 0.6);
+      }
+
+      .dark .duplicate-group {
+        border-color: #62403a;
+        background: #352622;
+        color: #f0b6aa;
+      }
+
+      @media (max-width: 700px) {
+        .container {
+          width: min(100% - 28px, 1320px);
+          padding-top: 18px;
+        }
+
+        .topbar {
+          margin-bottom: 35px;
+        }
+
+        .topbar-note {
+          display: none;
+        }
+
+        .brand {
+          font-size: 12px;
+        }
+
+        .brand-mark {
+          width: 35px;
+          height: 35px;
+        }
+
+        .hero {
+          margin-bottom: 22px;
+        }
+
+        .hero-copy {
+          max-width: 380px;
+          font-size: 13px;
+        }
+
+        .search-panel {
+          padding: 8px;
+          border-radius: 19px;
+        }
+
+        .upload-box {
+          min-height: 198px;
+          padding: 22px 14px;
+        }
+
+        .search-toolbar {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          padding: 11px 1px 1px;
+        }
+
+        .btn-search {
+          grid-column: 1 / -1;
+          width: 100%;
+        }
+
+        .file-count {
+          grid-column: 1 / -1;
+          margin: 2px 0 0;
+          text-align: center;
+        }
+
+        .threshold-control {
+          justify-content: center;
+        }
+
+        .results-section {
+          margin-top: 34px;
+        }
+
+        .results {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+
+        .card {
+          border-radius: 14px;
+        }
+
+        .card-img-wrap {
+          padding: 7px;
+        }
+
+        .main-img {
+          height: clamp(140px, 48vw, 220px);
+        }
+
+        .card-body {
+          gap: 8px;
+          padding: 10px;
+        }
+
+        .card-header {
+          align-items: flex-start;
+          gap: 5px;
+        }
+
+        .card-header .left {
+          gap: 5px;
+        }
+
+        .badge {
+          padding: 3px 6px;
+          font-size: 8px;
+        }
+
+        .score {
+          font-size: 11px;
+        }
+
+        .detail-row {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 4px;
+          font-size: 10px;
+        }
+
+        .actions {
+          gap: 5px;
+        }
+
+        .actions button {
+          min-width: calc(50% - 3px);
+          min-height: 32px;
+          font-size: 9px;
+        }
+
+        .compare-wrapper {
+          width: 100%;
+          flex-direction: column;
+          gap: 12px;
+          padding: 14px;
+        }
+
+        .compare-side img {
+          max-height: 34vh;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .results {
+          grid-template-columns: 1fr;
+        }
+
+        .main-img {
+          height: 230px;
+        }
+
+        .results-heading {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
     </style>
   </head>
 
   <body>
-    <div class="toggle" onclick="toggleDark()">🌙</div>
-
     <div class="container">
-      <h1>🔍 AI Tìm Hàng Secondhand</h1>
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">⌕</span>
+          <span>AI FIND <span style="font-weight: 500; color: var(--muted)">· Secondhand</span></span>
+        </div>
+        <div class="topbar-actions">
+          <span class="topbar-note">Tìm món đồ qua hình ảnh</span>
+          <button class="toggle" id="themeToggle" type="button" onclick="toggleDark()" aria-label="Bật giao diện tối" title="Đổi giao diện">☾</button>
+        </div>
+      </header>
 
-      <div class="upload-box" id="uploadBox">
-        👉 Kéo thả, click hoặc Ctrl+V để dán ảnh
-        <input type="file" id="fileInput" hidden multiple accept="image/*" />
-      </div>
+      <section class="hero">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> Tìm kiếm bằng AI</div>
+        <h1>Tìm món đồ bạn cần</h1>
+        <p class="hero-copy">Tải ảnh lên để tìm những sản phẩm tương tự trong kho hàng. Có thể chọn nhiều ảnh, kéo thả hoặc dán trực tiếp từ clipboard.</p>
+      </section>
 
-      <div class="preview-list" id="previewList"></div>
+      <section class="search-panel" aria-label="Tìm sản phẩm bằng ảnh">
+        <div class="upload-box" id="uploadBox" role="button" tabindex="0" aria-label="Chọn hoặc kéo thả ảnh để tìm kiếm">
+          <div class="upload-content">
+            <span class="upload-icon" aria-hidden="true">↥</span>
+            <span class="upload-title">Thả ảnh vào đây để bắt đầu</span>
+            <span class="upload-hint">hoặc <strong>chọn ảnh từ thiết bị</strong><br />Hỗ trợ JPG, PNG, WEBP · Có thể dán ảnh bằng Ctrl+V</span>
+          </div>
+          <input type="file" id="fileInput" hidden multiple accept="image/*" />
+        </div>
 
-      <div
-        style="margin-top: 10px; display: flex; align-items: center; gap: 8px"
-      >
-        <button class="btn-search" id="btnSearch" onclick="upload()">
-          Tìm
+        <div class="preview-list" id="previewList" aria-live="polite"></div>
+
+        <div class="search-toolbar">
+          <button class="btn-search" id="btnSearch" onclick="upload()">⌕ &nbsp; Tìm sản phẩm</button>
+          <button class="btn-clear" onclick="clearAll()">Xóa ảnh</button>
+          <button class="btn-duplicate" onclick="detectDuplicates()">◇ &nbsp; Tìm ảnh trùng</button>
+          <label class="threshold-control" for="duplicateThreshold">Độ khớp
+            <input type="number" id="duplicateThreshold" min="0.9" max="0.99" step="0.01" value="0.95" aria-label="Ngưỡng tìm ảnh trùng" />
+          </label>
+          <span class="file-count" id="fileCount"></span>
+        </div>
+      </section>
+
+      <section class="results-section" aria-labelledby="resultsTitle">
+        <div class="results-heading">
+          <div>
+            <h2 class="results-title" id="resultsTitle">Sản phẩm phù hợp</h2>
+            <p class="results-subtitle" id="resultsSubtitle" aria-live="polite">Kết quả tìm kiếm sẽ hiển thị tại đây</p>
+          </div>
+          <span class="results-count" id="resultsCount"></span>
+        </div>
+        <div id="results" class="results">
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true">⌕</span>
+            <strong>Sẵn sàng tìm kiếm</strong>
+            <span>Chọn hoặc kéo thả ảnh sản phẩm vào khung phía trên.</span>
+          </div>
+        </div>
+
+        <button
+          id="loadMoreBtn"
+          class="load-more"
+          style="display: none"
+          onclick="loadMore()"
+        >
+          Xem thêm sản phẩm
         </button>
-        <button class="btn-clear" onclick="clearAll()">Xóa</button>
-        <button class="btn-duplicate" onclick="detectDuplicates()">
-          Tìm trùng
-        </button>
-        <span class="file-count" id="fileCount"></span>
-      </div>
-
-      <div id="results" class="results"></div>
-
-      <button
-        id="loadMoreBtn"
-        class="load-more"
-        style="display: none"
-        onclick="loadMore()"
-      >
-        Xem thêm
-      </button>
+      </section>
     </div>
 
     <!-- IMAGE MODAL -->
@@ -454,6 +1309,19 @@
       // ================= DARK MODE =================
       function toggleDark() {
         document.body.classList.toggle("dark");
+        const isDark = document.body.classList.contains("dark");
+        localStorage.setItem("aiFindTheme", isDark ? "dark" : "light");
+        updateThemeButton();
+      }
+
+      function updateThemeButton() {
+        const isDark = document.body.classList.contains("dark");
+        const button = document.getElementById("themeToggle");
+        button.textContent = isDark ? "☀" : "☾";
+        button.setAttribute(
+          "aria-label",
+          isDark ? "Bật giao diện sáng" : "Bật giao diện tối",
+        );
       }
 
       // ================= UPLOAD BOX =================
@@ -461,6 +1329,18 @@
       const fileInput = document.getElementById("fileInput");
 
       uploadBox.addEventListener("click", () => fileInput.click());
+      uploadBox.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          fileInput.click();
+        }
+      });
+      fileInput.addEventListener("click", (event) => event.stopPropagation());
+
+      if (localStorage.getItem("aiFindTheme") === "dark") {
+        document.body.classList.add("dark");
+      }
+      updateThemeButton();
 
       uploadBox.addEventListener("dragover", (e) => {
         e.preventDefault();
@@ -528,6 +1408,15 @@
 
         selectedFiles = [...selectedFiles, ...mapped];
         renderPreviews();
+        results = [];
+        currentPage = 1;
+        hasMore = false;
+        document.getElementById("results").innerHTML =
+          '<div class="empty-state"><span class="empty-state-icon" aria-hidden="true">⌕</span><strong>Ảnh đã sẵn sàng</strong><span>Nhấn “Tìm sản phẩm” để xem kết quả phù hợp.</span></div>';
+        document.getElementById("resultsSubtitle").textContent =
+          "Ảnh đã được thêm · sẵn sàng tìm kiếm";
+        document.getElementById("resultsCount").textContent = "";
+        toggleLoadMore();
         toast("✅ Đã thêm " + validFiles.length + " ảnh");
       }
 
@@ -552,7 +1441,12 @@
 
         document.getElementById("previewList").innerHTML = "";
         document.getElementById("results").innerHTML = "";
+        document.getElementById("resultsSubtitle").textContent =
+          "Kết quả tìm kiếm sẽ hiển thị tại đây";
+        document.getElementById("resultsCount").textContent = "";
         document.getElementById("loadMoreBtn").style.display = "none";
+        document.getElementById("results").innerHTML =
+          '<div class="empty-state"><span class="empty-state-icon" aria-hidden="true">⌕</span><strong>Sẵn sàng tìm kiếm</strong><span>Chọn hoặc kéo thả ảnh sản phẩm vào khung phía trên.</span></div>';
         updateFileCount();
       }
 
@@ -594,7 +1488,7 @@
         if (selectedFiles.length > 0) {
           el.textContent = selectedFiles.length + " ảnh đã chọn";
         } else {
-          el.textContent = "";
+          el.textContent = "Chưa chọn ảnh";
         }
       }
 
@@ -607,7 +1501,12 @@
         if (isSearching) return;
 
         isSearching = true;
-        document.getElementById("btnSearch").disabled = true;
+        const searchButton = document.getElementById("btnSearch");
+        searchButton.disabled = true;
+        searchButton.textContent = "Đang tìm…";
+        document.getElementById("resultsSubtitle").textContent =
+          "AI đang phân tích ảnh và tìm sản phẩm tương tự";
+        document.getElementById("resultsCount").textContent = "";
         showLoading();
         currentPage = 1;
 
@@ -622,7 +1521,7 @@
             body: fd,
           });
 
-          const data = await res.json();
+          const data = await res.json().catch(() => ({}));
 
           if (!res.ok) {
             throw new Error(data.error || "Server error " + res.status);
@@ -632,16 +1531,23 @@
           hasMore = data.has_more || false;
 
           draw(results);
+          document.getElementById("resultsSubtitle").textContent =
+            "Được xếp hạng theo độ tương đồng hình ảnh";
+          document.getElementById("resultsCount").textContent =
+            (data.total || results.length) + " sản phẩm";
           toggleLoadMore();
         } catch (err) {
           toast("❌ Lỗi: " + err.message);
           document.getElementById("results").innerHTML =
-            "<div style='grid-column:1/-1;text-align:center;color:#ef4444'>❌ " +
-            err.message +
-            "</div>";
+            '<div class="empty-state"><span class="empty-state-icon" aria-hidden="true">!</span><strong>Không thể tìm kiếm</strong><span>' +
+            escapeHTML(err.message) +
+            "</span></div>";
+          document.getElementById("resultsSubtitle").textContent =
+            "Đã xảy ra lỗi khi kết nối tới dịch vụ tìm kiếm";
         } finally {
           isSearching = false;
-          document.getElementById("btnSearch").disabled = false;
+          searchButton.disabled = false;
+          searchButton.textContent = "⌕  Tìm sản phẩm";
         }
       }
 
@@ -650,6 +1556,9 @@
         if (isSearching) return;
         isSearching = true;
         currentPage++;
+        const loadMoreButton = document.getElementById("loadMoreBtn");
+        loadMoreButton.disabled = true;
+        loadMoreButton.textContent = "Đang tải…";
 
         try {
           const fd = new FormData();
@@ -662,7 +1571,7 @@
             body: fd,
           });
 
-          const data = await res.json();
+          const data = await res.json().catch(() => ({}));
 
           if (!res.ok) {
             throw new Error(data.error || "Server error " + res.status);
@@ -672,12 +1581,16 @@
           hasMore = data.has_more || false;
 
           draw(results);
+          document.getElementById("resultsCount").textContent =
+            results.length + " sản phẩm";
           toggleLoadMore();
         } catch (err) {
           currentPage--;
           toast("❌ Lỗi: " + err.message);
         } finally {
           isSearching = false;
+          loadMoreButton.disabled = false;
+          loadMoreButton.textContent = "Xem thêm sản phẩm";
         }
       }
 
@@ -699,138 +1612,234 @@
 
       // ================= DUPLICATE DETECTION =================
       async function detectDuplicates() {
-        const threshold = prompt("Nhập threshold (0.9 - 0.99):", "0.95");
-        if (!threshold) return;
+        const thresholdInput = document.getElementById("duplicateThreshold");
+        const threshold = Number(thresholdInput.value);
+        if (!Number.isFinite(threshold) || threshold < 0.9 || threshold > 0.99) {
+          toast("⚠️ Độ khớp phải nằm trong khoảng 0.90–0.99");
+          thresholdInput.focus();
+          return;
+        }
 
         showLoading();
+        document.getElementById("resultsSubtitle").textContent =
+          "Đang quét kho ảnh để tìm các nhóm trùng lặp";
 
         try {
           const res = await fetch(
-            API + "/detect-duplicates?threshold=" + threshold,
+            API + "/detect-duplicates?threshold=" + encodeURIComponent(threshold),
           );
-          const data = await res.json();
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(data.error || "Server error " + res.status);
+          }
 
           const box = document.getElementById("results");
           box.innerHTML = "";
 
           if (!data.duplicates || !data.duplicates.length) {
             box.innerHTML =
-              "<div style='grid-column:1/-1;text-align:center'>✅ Không có ảnh trùng</div>";
+              '<div class="empty-state"><span class="empty-state-icon" aria-hidden="true">✓</span><strong>Không tìm thấy ảnh trùng</strong><span>Thử giảm độ khớp để tìm các ảnh tương tự hơn.</span></div>';
+            document.getElementById("resultsSubtitle").textContent =
+              "Hoàn tất kiểm tra ảnh trùng";
+            document.getElementById("resultsCount").textContent = "0 nhóm";
             return;
           }
 
           data.duplicates.forEach((group) => {
-            box.innerHTML +=
-              '<div class="duplicate-group"><b>Nhóm trùng:</b> ' +
-              group.join(", ") +
-              "</div>";
+            const groupElement = document.createElement("div");
+            groupElement.className = "duplicate-group";
+            const title = document.createElement("strong");
+            title.textContent = "Nhóm ảnh trùng";
+            const ids = document.createElement("div");
+            ids.textContent = group.join(", ");
+            ids.style.marginTop = "7px";
+            groupElement.append(title, ids);
+            box.appendChild(groupElement);
           });
+          document.getElementById("resultsSubtitle").textContent =
+            "Các nhóm được tìm thấy trong kho ảnh";
+          document.getElementById("resultsCount").textContent =
+            data.count + " nhóm";
         } catch (err) {
           toast("❌ Lỗi: " + err.message);
+          document.getElementById("results").innerHTML =
+            '<div class="empty-state"><span class="empty-state-icon" aria-hidden="true">!</span><strong>Không thể quét ảnh trùng</strong><span>' +
+            escapeHTML(err.message) +
+            "</span></div>";
+          document.getElementById("resultsSubtitle").textContent =
+            "Đã xảy ra lỗi khi kiểm tra kho ảnh";
+        } finally {
+          document.getElementById("loadMoreBtn").style.display = "none";
         }
       }
 
       // ================= DRAW RESULTS =================
+      function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, (character) => {
+          const entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          };
+          return entities[character];
+        });
+      }
+
+      function getImageUrl(path) {
+        return (
+          API +
+          "/" +
+          String(path || "")
+            .replace(/^\/+/, "")
+            .split("/")
+            .map(encodeURIComponent)
+            .join("/")
+        );
+      }
+
       function draw(arr) {
         const box = document.getElementById("results");
         box.innerHTML = "";
 
         if (!arr.length) {
           box.innerHTML =
-            "<div style='grid-column:1/-1;text-align:center'>❌ Không tìm thấy</div>";
+            '<div class="empty-state"><span class="empty-state-icon" aria-hidden="true">⌕</span><strong>Chưa tìm thấy sản phẩm phù hợp</strong><span>Thử ảnh rõ hơn hoặc chọn một góc chụp khác.</span></div>';
           return;
         }
 
         arr.forEach((item, index) => {
-          const imgs =
-            item.images && item.images.length ? item.images : [item.image_url];
-
-          const firstImg = API + "/" + imgs[0].replace(/^\/+/, "");
-
+          const imgs = item.images?.length ? item.images : [item.image_url];
+          const firstImg = getImageUrl(imgs[0]);
+          const score = Number(item.score) || 0;
+          const itemId = String(item.item_id ?? "");
           const card = document.createElement("div");
           card.className = "card" + (index === 0 ? " top1" : "");
+          card.dataset.itemId = itemId;
 
-          // Thumbnails
-          let thumbsHtml = "";
-          imgs.forEach((img) => {
-            const src = API + "/" + img.replace(/^\/+/, "");
-            thumbsHtml +=
-              '<img class="thumb" src="' +
-              src +
-              '" onclick="changeMainImage(this)" onerror="this.style.display=\'none\'">';
+          const imageWrap = document.createElement("div");
+          imageWrap.className = "card-img-wrap";
+          const mainImage = document.createElement("img");
+          mainImage.className = "main-img";
+          mainImage.src = firstImg;
+          mainImage.alt = "Ảnh sản phẩm " + itemId;
+          mainImage.loading = "lazy";
+          mainImage.addEventListener("click", () => {
+            if (mainImage.src) openModal(mainImage.src);
           });
+          mainImage.addEventListener("error", () => {
+            mainImage.removeAttribute("src");
+            mainImage.alt = "Không tải được ảnh sản phẩm";
+            mainImage.classList.add("image-error");
+          }, { once: true });
+          imageWrap.appendChild(mainImage);
 
-          card.innerHTML =
-            '<div class="card-img-wrap">' +
-            '<img class="main-img" src="' +
-            firstImg +
-            '" ' +
-            'onclick="openModal(this.src)" ' +
-            "onerror=\"this.src='data:image/svg+xml," +
-            "<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22>" +
-            "<rect width=%22200%22 height=%22200%22 fill=%22%23f1f5f9%22/>" +
-            "<text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 font-size=%2216%22>No Image</text>" +
-            "</svg>'\">" +
-            '<div class="image-strip">' +
-            thumbsHtml +
-            "</div>" +
-            "</div>" +
-            '<div class="card-body">' +
-            '<div class="card-header">' +
-            '<div class="left">' +
-            '<div class="item-id">#' +
-            item.item_id +
-            "</div>" +
-            '<span class="badge ' +
-            (item.score > 0.9 ? "green" : "gray") +
-            '">' +
-            (item.score > 0.9 ? "TOP MATCH" : "GẦN ĐÚNG") +
-            "</span>" +
-            "</div>" +
-            '<div class="right">' +
-            '<div class="score">' +
-            (item.score * 100).toFixed(1) +
-            "%</div>" +
-            "</div>" +
-            "</div>" +
-            '<div class="detail-box">' +
-            '<div class="detail-row">' +
-            "<span>🗓 " +
-            (item.modified_date || "N/A") +
-            "</span>" +
-            "<span>📦 " +
-            imgs.length +
-            " tấm</span>" +
-            "</div>" +
-            "</div>" +
-            '<div class="actions">' +
-            '<button class="copy-btn" onclick="copy(\'' +
-            item.item_id +
-            "')\">" +
-            "Copy</button>" +
-            '<button class="compare-btn" onclick="compareImages(\'' +
-            firstImg +
-            "')\">" +
-            "So sánh</button>" +
-            '<button class="manage-btn" onclick="moveToSold(\'' +
-            item.item_id +
-            "')\">" +
-            "SOLD</button>" +
-            '<button class="manage-btn" onclick="deleteItem(\'' +
-            item.item_id +
-            "')\">" +
-            "Xóa</button>" +
-            "</div>" +
-            "</div>";
+          if (imgs.length > 1) {
+            const strip = document.createElement("div");
+            strip.className = "image-strip";
+            imgs.forEach((path, imageIndex) => {
+              const thumb = document.createElement("img");
+              thumb.className = "thumb" + (imageIndex === 0 ? " active" : "");
+              thumb.src = getImageUrl(path);
+              thumb.alt = "Ảnh " + (imageIndex + 1) + " của sản phẩm " + itemId;
+              thumb.loading = "lazy";
+              thumb.addEventListener("click", () => {
+                mainImage.src = thumb.src;
+                strip.querySelectorAll(".thumb").forEach((image) =>
+                  image.classList.remove("active"),
+                );
+                thumb.classList.add("active");
+              });
+              thumb.addEventListener(
+                "error",
+                () => (thumb.style.display = "none"),
+                { once: true },
+              );
+              strip.appendChild(thumb);
+            });
+            imageWrap.appendChild(strip);
+          }
 
+          const body = document.createElement("div");
+          body.className = "card-body";
+          const header = document.createElement("div");
+          header.className = "card-header";
+          const left = document.createElement("div");
+          left.className = "left";
+          const idLabel = document.createElement("div");
+          idLabel.className = "item-id";
+          idLabel.textContent = "#" + itemId;
+          const badge = document.createElement("span");
+          badge.className = "badge " + (score > 0.9 ? "green" : "gray");
+          badge.textContent = score > 0.9 ? "KHỚP CAO" : "TƯƠNG TỰ";
+          left.append(idLabel, badge);
+          const scoreLabel = document.createElement("div");
+          scoreLabel.className = "score";
+          scoreLabel.textContent = (score * 100).toFixed(1) + "%";
+          header.append(left, scoreLabel);
+
+          const detail = document.createElement("div");
+          detail.className = "detail-box";
+          const detailRow = document.createElement("div");
+          detailRow.className = "detail-row";
+          const date = document.createElement("span");
+          date.textContent = "◷  " + (item.modified_date || "N/A");
+          const imageCount = document.createElement("span");
+          imageCount.textContent = "▧  " + imgs.length + " ảnh";
+          detailRow.append(date, imageCount);
+          detail.appendChild(detailRow);
+
+          const actions = document.createElement("div");
+          actions.className = "actions";
+          const makeAction = (label, className, handler) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = className;
+            button.textContent = label;
+            button.addEventListener("click", handler);
+            return button;
+          };
+          actions.append(
+            makeAction("Copy mã", "copy-btn", () => copy(itemId)),
+            makeAction("So sánh", "compare-btn", () => compareImages(firstImg)),
+            makeAction("Đã bán", "manage-btn", () => moveToSold(itemId)),
+            makeAction("Xóa", "manage-btn", () => deleteItem(itemId)),
+          );
+
+          body.append(header, detail, actions);
+          card.append(imageWrap, body);
           box.appendChild(card);
         });
       }
 
       // ================= ACTIONS =================
+      async function postItemAction(action, id) {
+        const res = await fetch(
+          API + "/" + action + "/" + encodeURIComponent(id),
+          { method: "POST" },
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || "Server error " + res.status);
+        }
+        return data;
+      }
+
+      function removeResultFromView(id) {
+        results = results.filter((item) => String(item.item_id) !== String(id));
+        draw(results);
+        document.getElementById("resultsCount").textContent =
+          results.length + " sản phẩm đang hiển thị";
+      }
+
       async function moveToSold(id) {
         try {
-          await fetch(API + "/move-to-sold/" + id, { method: "POST" });
+          const data = await postItemAction("move-to-sold", id);
+          if (data.status !== "moved") {
+            throw new Error("Không tìm thấy sản phẩm trong kho đang bán.");
+          }
+          removeResultFromView(id);
           toast("✅ Đã chuyển SOLD: " + id);
         } catch (err) {
           toast("❌ Lỗi: " + err.message);
@@ -840,7 +1849,11 @@
       async function deleteItem(id) {
         if (!confirm("Xóa sản phẩm " + id + "?")) return;
         try {
-          await fetch(API + "/delete-item/" + id, { method: "POST" });
+          const data = await postItemAction("delete-item", id);
+          if (data.status !== "deleted") {
+            throw new Error("Không tìm thấy sản phẩm để xóa.");
+          }
+          removeResultFromView(id);
           toast("🗑 Đã xóa: " + id);
         } catch (err) {
           toast("❌ Lỗi: " + err.message);
@@ -849,7 +1862,10 @@
 
       async function restoreItem(id) {
         try {
-          await fetch(API + "/restore-item/" + id, { method: "POST" });
+          const data = await postItemAction("restore-item", id);
+          if (data.status !== "restored") {
+            throw new Error("Không tìm thấy sản phẩm đã bán để khôi phục.");
+          }
           toast("♻ Đã restore: " + id);
         } catch (err) {
           toast("❌ Lỗi: " + err.message);
